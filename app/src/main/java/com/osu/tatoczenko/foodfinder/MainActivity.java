@@ -21,7 +21,7 @@ public class MainActivity extends FragmentActivity {
             fragmentTransaction.add(R.id.container, menuFragment);
             fragmentTransaction.commit();
         }
-    }
+    } // Testing if I can push
 
 
     @Override
