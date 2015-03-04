@@ -18,7 +18,7 @@ public class MainActivity extends FragmentActivity {
             MainMenuFragment menuFragment = new MainMenuFragment();
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.container, menuFragment);
+            fragmentTransaction.add(R.id.mainFrameDetails, menuFragment);
             fragmentTransaction.commit();
         }
     }
