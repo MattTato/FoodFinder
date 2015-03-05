@@ -22,6 +22,7 @@ public class MainActivity extends FragmentActivity {
             fragmentTransaction.commit();
         }
     } // Testing if I can push
+    // You can!
 
 
     @Override

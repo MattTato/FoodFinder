@@ -1,6 +1,8 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -31,15 +33,29 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
     }
 
     public void onClick(View v) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction;
         switch(v.getId()){
             case R.id.findfood_button:
-
+                fragmentTransaction = fragmentManager.beginTransaction();
+                FoodTypeFragment foodTypeFragment = new FoodTypeFragment();
+                fragmentTransaction.replace(R.id.mainFrameDetails, foodTypeFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 break;
             case R.id.search_button:
-
+                fragmentTransaction = fragmentManager.beginTransaction();
+                SearchFragment searchFragment = new SearchFragment();
+                fragmentTransaction.replace(R.id.mainFrameDetails, searchFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 break;
             case R.id.favorites_button:
-
+                fragmentTransaction = fragmentManager.beginTransaction();
+                SavedLocationsFragment savedLocationsFragment = new SavedLocationsFragment();
+                fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 break;
             case R.id.exit_button:
                 getActivity().finish();
