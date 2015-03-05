@@ -2,13 +2,13 @@ package com.osu.tatoczenko.foodfinder;
 
 import android.app.FragmentTransaction;
 import android.app.FragmentManager;
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
