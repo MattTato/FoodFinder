@@ -6,14 +6,17 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.util.Log;
 
 
 public class MainActivity extends Activity {
+    String message = "Android_Log_Test : ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
             MainMenuFragment menuFragment = new MainMenuFragment();
             FragmentManager fragmentManager = getFragmentManager();
@@ -23,6 +26,25 @@ public class MainActivity extends Activity {
         }
     } // Testing if I can push
     // You can!
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(message, "The onStart() event");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(message, "The onResume() event");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(message, "The onPause() event");
+    }
 
 
     @Override
