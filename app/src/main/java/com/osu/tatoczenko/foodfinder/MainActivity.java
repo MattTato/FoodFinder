@@ -46,6 +46,20 @@ public class MainActivity extends Activity {
         Log.d(message, "The onPause() event");
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(message, "The onStop() event");
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(message, "The onDestroy() event");
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
