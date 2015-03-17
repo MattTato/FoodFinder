@@ -24,9 +24,7 @@ public class MainActivity extends Activity {
             fragmentTransaction.add(R.id.mainFrameDetails, menuFragment);
             fragmentTransaction.commit();
         }
-    } // Testing if I can push
-    // You can!
-
+    }
 
     @Override
     protected void onStart() {
@@ -58,7 +56,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         Log.d(message, "The onDestroy() event");
     }
-
 
 
     @Override

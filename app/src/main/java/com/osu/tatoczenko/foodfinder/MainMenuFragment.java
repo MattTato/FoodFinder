@@ -15,24 +15,24 @@ import android.app.FragmentManager;
 /**
  * A placeholder fragment containing a simple view.
  */
-        public class MainMenuFragment extends Fragment implements OnClickListener{
+public class MainMenuFragment extends Fragment implements OnClickListener{
 
-            @Override
-            public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                     Bundle savedInstanceState) {
-                View rootView = inflater.inflate(R.layout.main_menu, container, false);
-                View btnFind = rootView.findViewById(R.id.findfood_button);
-                btnFind.setOnClickListener(this);
-                View btnSearch = rootView.findViewById(R.id.search_button);
-                btnSearch.setOnClickListener(this);
-                View btnFavorites = rootView.findViewById(R.id.favorites_button);
-                btnFavorites.setOnClickListener(this);
-                View btnExit = rootView.findViewById(R.id.exit_button);
-                btnExit.setOnClickListener(this);
-                return rootView;
-            }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.main_menu, container, false);
+        View btnFind = rootView.findViewById(R.id.findfood_button);
+        btnFind.setOnClickListener(this);
+        View btnSearch = rootView.findViewById(R.id.search_button);
+        btnSearch.setOnClickListener(this);
+        View btnFavorites = rootView.findViewById(R.id.favorites_button);
+        btnFavorites.setOnClickListener(this);
+        View btnExit = rootView.findViewById(R.id.exit_button);
+        btnExit.setOnClickListener(this);
+        return rootView;
+    }
 
-            public void onClick(View v) {
+    public void onClick(View v) {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
         switch(v.getId()){
@@ -62,5 +62,4 @@ import android.app.FragmentManager;
                 break;
         }
     }
-
 }
