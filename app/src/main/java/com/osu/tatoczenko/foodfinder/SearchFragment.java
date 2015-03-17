@@ -1,6 +1,7 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.location.Location;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -25,10 +26,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class SearchFragment extends Fragment implements OnClickListener{
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
+    Location mLocation;
 
     public SearchFragment() {
         // Required empty public constructor
+    }
+
+    public void UpdateLocation(Location location){
+        mLocation = location;
     }
 
 
@@ -51,6 +56,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
             case R.id.map_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 FoodMapFragment mapFragment = new FoodMapFragment();
+                mapFragment.SetupMarkerLocation(mLocation);
                 fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

@@ -2,20 +2,30 @@ package com.osu.tatoczenko.foodfinder;
 
 
 import android.app.FragmentManager;
-        import android.app.FragmentTransaction;
-        import android.view.View.OnClickListener;
-        import android.os.Bundle;
-        import android.app.Fragment;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.TextView;
+import android.app.FragmentTransaction;
+import android.location.Location;
+import android.view.View.OnClickListener;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainMenuFragment extends Fragment implements OnClickListener{
+
+    Location mLocation;
+    FoodTypeFragment foodTypeFragment;
+    SearchFragment searchFragment;
+    SavedLocationsFragment savedLocationsFragment;
+
+    public void UpdatedLocation(Location location){
+        mLocation = location;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,21 +48,22 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
         switch(v.getId()){
             case R.id.findfood_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
-                FoodTypeFragment foodTypeFragment = new FoodTypeFragment();
+                foodTypeFragment = new FoodTypeFragment();
                 fragmentTransaction.replace(R.id.mainFrameDetails, foodTypeFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case R.id.search_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
-                SearchFragment searchFragment = new SearchFragment();
+                searchFragment = new SearchFragment();
+                searchFragment.UpdateLocation(mLocation);
                 fragmentTransaction.replace(R.id.mainFrameDetails, searchFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case R.id.favorites_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
-                SavedLocationsFragment savedLocationsFragment = new SavedLocationsFragment();
+                savedLocationsFragment = new SavedLocationsFragment();
                 fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

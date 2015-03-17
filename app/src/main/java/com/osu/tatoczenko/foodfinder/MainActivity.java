@@ -3,22 +3,41 @@ package com.osu.tatoczenko.foodfinder;
 import android.app.FragmentTransaction;
 import android.app.FragmentManager;
 import android.app.Activity;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
     String message = "Android_Log_Test : ";
+
+    GoogleApiClient mGoogleApiClient;
+    Location mLocation;
+    LocationRequest mLocationRequest;
+    MainMenuFragment menuFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        buildGoogleApiClient();
+        createLocationRequest();
+        mGoogleApiClient.connect();
+
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
-            MainMenuFragment menuFragment = new MainMenuFragment();
+            menuFragment = new MainMenuFragment();
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.mainFrameDetails, menuFragment);
@@ -42,6 +61,7 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         Log.d(message, "The onPause() event");
+        stopLocationUpdates();
     }
 
     @Override
@@ -78,5 +98,50 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint){
+        startLocationUpdates();
+        mLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        menuFragment.UpdatedLocation(mLocation);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i){
+        // Do things
+    }
+
+    @Override
+    public void onLocationChanged(Location location){
+        mLocation = location;
+        menuFragment.UpdatedLocation(mLocation);
+    }
+
+    protected void startLocationUpdates(){
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates(){
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    protected void createLocationRequest() {
+        if(mLocationRequest == null) {
+            mLocationRequest = new LocationRequest();
+            mLocationRequest.setInterval(10000);
+            mLocationRequest.setFastestInterval(5000);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        }
+    }
+
+    protected synchronized void buildGoogleApiClient(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }
