@@ -131,7 +131,7 @@ public class FoodMapFragment extends Fragment {
                                                                     .title("You Are Here")
                                                                     .snippet(location.getLatitude() +", "+ location.getLongitude())
                                                     );
-                                                    mMarker.showInfoWindow();
+                                                    //mMarker.showInfoWindow();
                                                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14));
                                                 }
                                             });
@@ -166,11 +166,10 @@ public class FoodMapFragment extends Fragment {
             if (mMap != null) {
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 UiSettings mapSettings = mMap.getUiSettings();
-                mapSettings.setAllGesturesEnabled(false);
-                mapSettings.setZoomControlsEnabled(false);
+                mapSettings.setAllGesturesEnabled(true);
+                mapSettings.setZoomControlsEnabled(true);
                 mapSettings.setMyLocationButtonEnabled(true);
                 setMarkerByLocation(currentLocation);
-
             }
         }
     }
