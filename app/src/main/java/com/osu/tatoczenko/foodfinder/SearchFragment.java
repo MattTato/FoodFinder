@@ -50,7 +50,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
         switch(v.getId()){
             case R.id.map_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
-                MapFragment mapFragment = MapFragment.newInstance();
+                FoodMapFragment mapFragment = new FoodMapFragment();
                 fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
