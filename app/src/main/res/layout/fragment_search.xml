@@ -20,13 +20,11 @@
             android:textStyle="italic"
             android:gravity="center_horizontal" />
 
-        <EditText
+        <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/searchText_input"
-            android:layout_gravity="center_horizontal"
-            android:hint="Enter name of restaurant"
-            android:textStyle="italic" />
+            android:id="@+id/autocomplete_food_search"
+            android:hint="Search for food here..." />
 
         <Button
             android:layout_width="fill_parent"

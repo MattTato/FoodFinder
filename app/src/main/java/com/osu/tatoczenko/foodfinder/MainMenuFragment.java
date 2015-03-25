@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainMenuFragment extends Fragment implements OnClickListener{
 
+    GoogleApiClient mGoogleApiClient;
     Location mLocation;
     FoodTypeFragment foodTypeFragment;
     SearchFragment searchFragment;
@@ -25,6 +28,10 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
 
     public void UpdatedLocation(Location location){
         mLocation = location;
+    }
+
+    public void UpdateGoogleAPIClient(GoogleApiClient googleApiClient){
+        mGoogleApiClient = googleApiClient;
     }
 
     @Override
@@ -57,6 +64,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
                 fragmentTransaction = fragmentManager.beginTransaction();
                 searchFragment = new SearchFragment();
                 searchFragment.UpdateLocation(mLocation);
+                searchFragment.UpdateGoogleApiClient(mGoogleApiClient);
                 fragmentTransaction.replace(R.id.mainFrameDetails, searchFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

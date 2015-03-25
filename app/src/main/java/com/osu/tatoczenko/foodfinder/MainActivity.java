@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,7 +24,7 @@ import com.google.android.gms.location.places.Places;
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
     String message = "Android_Log_Test : ";
 
-    GoogleApiClient mGoogleApiClient;
+    protected GoogleApiClient mGoogleApiClient;
     Location mLocation;
     LocationRequest mLocationRequest;
     MainMenuFragment menuFragment;
@@ -108,6 +109,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         mLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
         menuFragment.UpdatedLocation(mLocation);
+        menuFragment.UpdateGoogleAPIClient(mGoogleApiClient);
     }
 
     @Override
@@ -145,6 +147,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        mGoogleApiClient.disconnect();
     }
 }

@@ -1,7 +1,12 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.content.res.Resources;
 import android.location.Location;
+import android.net.Uri;
+import android.text.Html;
+import android.text.Spanned;
+import android.util.Log;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -10,11 +15,22 @@ import android.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
@@ -28,12 +44,24 @@ public class SearchFragment extends Fragment implements OnClickListener{
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     Location mLocation;
 
+    private GoogleApiClient mGoogleApiClient;
+
+    private AutoCompleteTextView mAutocompleteView;
+    private PlaceAutocompleteAdapter mAdapter;
+    private static final String TAG = "PlaceAutoCompleteAdapt";
+    private LatLngBounds BOUNDS_FOOD_SEARCH;
+
     public SearchFragment() {
         // Required empty public constructor
     }
 
     public void UpdateLocation(Location location){
         mLocation = location;
+        BOUNDS_FOOD_SEARCH = new LatLngBounds(new LatLng(mLocation.getLatitude() - 0.1, mLocation.getLongitude() - 0.1), new LatLng(mLocation.getLatitude() + 0.1, mLocation.getLongitude() + 0.1));
+    }
+
+    public void UpdateGoogleApiClient(GoogleApiClient googleApiClient){
+        mGoogleApiClient = googleApiClient;
     }
 
 
@@ -42,12 +70,80 @@ public class SearchFragment extends Fragment implements OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_search, container, false);
+        mAutocompleteView = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_food_search);
+        mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+
+        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
+        mAutocompleteView.setAdapter(mAdapter);
+        mAdapter.setGoogleApiClient(mGoogleApiClient);
+
         View btnMap = v.findViewById(R.id.map_button);
         btnMap.setOnClickListener(this);
         View btnBack = v.findViewById(R.id.searchback_button);
         btnBack.setOnClickListener(this);
         return v;
     }
+
+    /**
+     * Listener that handles selections from suggestions from the AutoCompleteTextView that
+     * displays Place suggestions.
+     * Gets the place id of the selected item and issues a request to the Places Geo Data API
+     * to retrieve more details about the place.
+     *
+     * @see com.google.android.gms.location.places.GeoDataApi#getPlaceById(com.google.android.gms.common.api.GoogleApiClient,
+     * String...)
+     */
+    private AdapterView.OnItemClickListener mAutocompleteClickListener
+            = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            /*
+             Retrieve the place ID of the selected item from the Adapter.
+             The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
+             read the place ID.
+              */
+            final PlaceAutocompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+            final String placeId = String.valueOf(item.placeId);
+            Log.i(TAG, "Autocomplete item selected: " + item.description);
+
+            /* Write code here to do a call to setup another marker point with the data from this location! */
+        }
+    };
+
+    /**
+     * Callback for results from a Places Geo Data API query that shows the first place result in
+     * the details view on screen.
+     */
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+            = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                // Request did not complete successfully
+                Log.e(TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+
+                return;
+            }
+            // Get the Place object from the buffer.
+            final Place place = places.get(0);
+
+            /* Format details of the place for display and show it in a TextView.
+            mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
+                    place.getId(), place.getAddress(), place.getPhoneNumber(),
+                    place.getWebsiteUri())); */
+
+            Log.i(TAG, "Place details received: " + place.getName());
+        }
+    };
+
+    /*private static Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
+                                              CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
+        Log.e(TAG, res.getString(R.string.place_details, name, id, address, phoneNumber,
+                websiteUri));
+        return Html.fromHtml(res.getString(R.string.place_details, name, id, address, phoneNumber,
+                websiteUri));
+
+    } */
 
     public void onClick(View v){
         FragmentManager fragmentManager = getFragmentManager();
