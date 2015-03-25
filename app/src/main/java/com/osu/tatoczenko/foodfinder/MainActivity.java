@@ -17,6 +17,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
+import com.google.android.gms.location.places.Places;
+
 
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
     String message = "Android_Log_Test : ";
@@ -137,7 +139,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     protected synchronized void buildGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API).build();
     }
 
     @Override
