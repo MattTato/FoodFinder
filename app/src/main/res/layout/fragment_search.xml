@@ -27,7 +27,13 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="I&apos;m the map!"
+            android:text="Clear Search"
+            android:id="@+id/clear_search_button" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Map it!"
             android:id="@+id/map_button" />
 
         <Button

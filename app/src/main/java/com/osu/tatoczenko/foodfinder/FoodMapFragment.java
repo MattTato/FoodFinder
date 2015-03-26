@@ -98,11 +98,13 @@ public class FoodMapFragment extends Fragment {
                 mapSettings.setZoomControlsEnabled(true);
                 mapSettings.setMyLocationButtonEnabled(true);
                 setMarkerByLocation(currentLocation);
-                AddFoodPlacesToMap();
+                mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
+                mMarker.showInfoWindow();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
                 mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
-                        mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
+                        AddFoodPlacesToMap();
                         ZoomCameraIn();
                     }
                 });
@@ -120,8 +122,6 @@ public class FoodMapFragment extends Fragment {
             LatLngBounds cameraBounds = cameraBoundsBuilder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraBounds, 0));
             mMap.moveCamera(CameraUpdateFactory.zoomOut());
-        } else {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
         }
     }
 

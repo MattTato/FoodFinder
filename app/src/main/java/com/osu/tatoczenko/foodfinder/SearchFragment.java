@@ -41,6 +41,7 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  *
  * Allows a user to search for a specific restaurant.
+ * Most of the code was taken from the Places Autocomplete Sample Project, but adapted to work for our app.
  */
 public class SearchFragment extends Fragment implements OnClickListener{
 
@@ -90,6 +91,8 @@ public class SearchFragment extends Fragment implements OnClickListener{
         mAdapter.setGoogleApiClient(mGoogleApiClient);
         mAdapter.setBounds(BOUNDS_FOOD_SEARCH);
 
+        View btnClear = v.findViewById(R.id.clear_search_button);
+        btnClear.setOnClickListener(this);
         View btnMap = v.findViewById(R.id.map_button);
         btnMap.setOnClickListener(this);
         View btnBack = v.findViewById(R.id.searchback_button);
@@ -119,7 +122,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
             final String placeId = String.valueOf(item.placeId);
             Log.i(TAG, "Autocomplete item selected: " + item.description);
 
-            /* Write code here to do a call to setup another marker point with the data from this location! */
             /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
               details about the place.
@@ -171,6 +173,9 @@ public class SearchFragment extends Fragment implements OnClickListener{
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
         switch(v.getId()){
+            case R.id.clear_search_button:
+                mAutocompleteView.setText("");
+                break;
             case R.id.map_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 FoodMapFragment mapFragment = new FoodMapFragment();

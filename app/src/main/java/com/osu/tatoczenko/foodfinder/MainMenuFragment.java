@@ -56,6 +56,10 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
             case R.id.findfood_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 foodTypeFragment = new FoodTypeFragment();
+                // Sends Google API client to do Place Autocomplete and Map calls later
+                foodTypeFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+                // Sends current user's location to be used in the map
+                foodTypeFragment.UpdatedLocation(mLocation);
                 fragmentTransaction.replace(R.id.mainFrameDetails, foodTypeFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -72,6 +76,10 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
             case R.id.favorites_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 savedLocationsFragment = new SavedLocationsFragment();
+                // Sends Google API client to do Place Autocomplete and Map calls later
+                savedLocationsFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+                // Sends current user's location to be used in the map
+                savedLocationsFragment.UpdatedLocation(mLocation);
                 fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

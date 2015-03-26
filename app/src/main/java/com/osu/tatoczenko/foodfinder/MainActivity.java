@@ -58,6 +58,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     protected void onResume() {
         super.onResume();
         Log.d(message, "The onResume() event");
+        if(!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     protected void onStop() {
         super.onStop();
         Log.d(message, "The onStop() event");
+        mGoogleApiClient.disconnect();
     }
 
 
