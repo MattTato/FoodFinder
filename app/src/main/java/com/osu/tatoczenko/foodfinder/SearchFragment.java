@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlaceTypes;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -32,6 +33,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 
 /**
@@ -46,7 +49,11 @@ public class SearchFragment extends Fragment implements OnClickListener{
 
     private GoogleApiClient mGoogleApiClient;
 
+    Place searchedFoodPlace;
+    ArrayList<Place> mPlaces = new ArrayList<>();
+
     private AutoCompleteTextView mAutocompleteView;
+    private AutocompleteFilter mFilter;
     private PlaceAutocompleteAdapter mAdapter;
     private static final String TAG = "PlaceAutoCompleteAdapt";
     private LatLngBounds BOUNDS_FOOD_SEARCH;
@@ -64,6 +71,10 @@ public class SearchFragment extends Fragment implements OnClickListener{
         mGoogleApiClient = googleApiClient;
     }
 
+    void CreatePlaceFilters(){
+        Log.d("Showing all places: ", PlaceTypes.ALL.toString());
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,9 +84,11 @@ public class SearchFragment extends Fragment implements OnClickListener{
         mAutocompleteView = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_food_search);
         mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
 
-        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
+        //CreatePlaceFilters();
+        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null );
         mAutocompleteView.setAdapter(mAdapter);
         mAdapter.setGoogleApiClient(mGoogleApiClient);
+        mAdapter.setBounds(BOUNDS_FOOD_SEARCH);
 
         View btnMap = v.findViewById(R.id.map_button);
         btnMap.setOnClickListener(this);
@@ -107,6 +120,13 @@ public class SearchFragment extends Fragment implements OnClickListener{
             Log.i(TAG, "Autocomplete item selected: " + item.description);
 
             /* Write code here to do a call to setup another marker point with the data from this location! */
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                    .getPlaceById(mGoogleApiClient, placeId);
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
         }
     };
 
@@ -125,14 +145,16 @@ public class SearchFragment extends Fragment implements OnClickListener{
                 return;
             }
             // Get the Place object from the buffer.
-            final Place place = places.get(0);
+            searchedFoodPlace = places.get(0);
+            mPlaces.clear();
+            mPlaces.add(searchedFoodPlace);
 
             /* Format details of the place for display and show it in a TextView.
             mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
                     place.getId(), place.getAddress(), place.getPhoneNumber(),
                     place.getWebsiteUri())); */
 
-            Log.i(TAG, "Place details received: " + place.getName());
+            Log.i(TAG, "Place details received: " + searchedFoodPlace.getName());
         }
     };
 
@@ -153,6 +175,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
                 fragmentTransaction = fragmentManager.beginTransaction();
                 FoodMapFragment mapFragment = new FoodMapFragment();
                 mapFragment.SetupMarkerLocation(mLocation);
+                mapFragment.GetFoodPlaces(mPlaces);
                 fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
 import android.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +21,18 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 
 /**
@@ -41,6 +47,7 @@ public class FoodMapFragment extends Fragment {
     private static Marker mMarker;
 
     private static Location currentLocation;
+    private ArrayList<Place> mPlaces = new ArrayList<>();
     private MapFragment mapFragment;
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
@@ -76,6 +83,8 @@ public class FoodMapFragment extends Fragment {
         currentLocation = location;
     }
 
+    public void GetFoodPlaces(ArrayList<Place> places) { mPlaces = places; }
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -83,14 +92,43 @@ public class FoodMapFragment extends Fragment {
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                mMarker =  mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 UiSettings mapSettings = mMap.getUiSettings();
                 mapSettings.setAllGesturesEnabled(true);
                 mapSettings.setZoomControlsEnabled(true);
                 mapSettings.setMyLocationButtonEnabled(true);
                 setMarkerByLocation(currentLocation);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
+                AddFoodPlacesToMap();
+                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                    @Override
+                    public void onMapLoaded() {
+                        mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
+                        ZoomCameraIn();
+                    }
+                });
+            }
+        }
+    }
+
+    private void ZoomCameraIn(){
+        if(mPlaces != null){
+            LatLngBounds.Builder cameraBoundsBuilder = new LatLngBounds.Builder();
+            cameraBoundsBuilder.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            for(Place place : mPlaces) {
+                cameraBoundsBuilder.include(place.getLatLng());
+            }
+            LatLngBounds cameraBounds = cameraBoundsBuilder.build();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraBounds, 0));
+            mMap.moveCamera(CameraUpdateFactory.zoomOut());
+        } else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
+        }
+    }
+
+    private void AddFoodPlacesToMap(){
+        if(mPlaces != null) {
+            for (Place place : mPlaces) {
+                mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
             }
         }
     }
