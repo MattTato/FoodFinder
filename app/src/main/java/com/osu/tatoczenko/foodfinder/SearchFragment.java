@@ -1,6 +1,5 @@
 package com.osu.tatoczenko.foodfinder;
 
-
 import android.content.res.Resources;
 import android.location.Location;
 import android.net.Uri;
@@ -77,7 +76,12 @@ public class SearchFragment extends Fragment implements OnClickListener{
 
     void CreatePlaceFilters(){
         List<Integer> placeList = new ArrayList<Integer>();
-        placeList.add(Place.TYPE_FOOD);
+        /*
+            So Autocomplete only filters by certain things. So I can't filter by FOOD or RESTAURANT, but ESTABLISHMENT works.
+            Here's the info: https://developers.google.com/places/supported_types
+            For now, it's better than nothing, but not exactly what I want. May look into further filtering.
+          */
+        placeList.add(Place.TYPE_ESTABLISHMENT);
         mFilter = AutocompleteFilter.create(placeList);
         Log.d("Set has these places: ", mFilter.toString());
     }
@@ -91,9 +95,9 @@ public class SearchFragment extends Fragment implements OnClickListener{
         mAutocompleteView = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_food_search);
         mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
 
-        //CreatePlaceFilters();
-        //mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
-        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
+        CreatePlaceFilters();
+        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
+        //mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
         mAutocompleteView.setAdapter(mAdapter);
         mAdapter.setGoogleApiClient(mGoogleApiClient);
         mAdapter.setBounds(BOUNDS_FOOD_SEARCH);
