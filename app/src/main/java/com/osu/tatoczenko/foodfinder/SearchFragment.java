@@ -35,6 +35,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -73,7 +76,10 @@ public class SearchFragment extends Fragment implements OnClickListener{
     }
 
     void CreatePlaceFilters(){
-        Log.d("Showing all places: ", PlaceTypes.ALL.toString());
+        List<Integer> placeList = new ArrayList<Integer>();
+        placeList.add(Place.TYPE_FOOD);
+        mFilter = AutocompleteFilter.create(placeList);
+        Log.d("Set has these places: ", mFilter.toString());
     }
 
 
@@ -86,7 +92,8 @@ public class SearchFragment extends Fragment implements OnClickListener{
         mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
 
         //CreatePlaceFilters();
-        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null );
+        //mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
+        mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
         mAutocompleteView.setAdapter(mAdapter);
         mAdapter.setGoogleApiClient(mGoogleApiClient);
         mAdapter.setBounds(BOUNDS_FOOD_SEARCH);
