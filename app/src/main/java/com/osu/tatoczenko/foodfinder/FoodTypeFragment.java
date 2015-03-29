@@ -1,6 +1,8 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,7 +16,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -83,21 +90,65 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     }
 
 
-    private ArrayList<String> parseJSONForPlacesIDs(String json) {
-        final String idString = "places_id";
+    private void parseJSONForPlaceIDs(String json) {
+        final String idString = "place_id";
         ArrayList ids = new ArrayList<String>();
         int index = 0;
-        index = json.indexOf("places_id");
-        /*while (index != -1) {
-            index = json.indexOf("places_id");
-
-        }*/
-        return ids;
+        if (json.contains(idString)) {
+            index = json.indexOf(idString, index + idString.length());
+            while (index != -1) {
+                // from the index of the beginning of "places_id", the id starts five characters
+                // after the end of "places_id" and is 27 characters long
+                int start = index + idString.length() + 5;
+                int end = start + 27;
+                String placeID = json.substring(start, end);
+                Log.d("FoodTypeFragment: ", "Place_ID: " + placeID);
+                index = json.indexOf(idString, index + idString.length());
+                ids.add(placeID);
+            }
+        }
+        mapPlaces(ids);
     }
 
     private void mapPlaces(ArrayList<String> places) {
+        // Get the places by id
+        int i = 0;
+        for (i = 0; i < places.size(); i++) {
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient,
+                    places.get(i));
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+        }
 
+        // Map the places
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction;
+        fragmentTransaction = fragmentManager.beginTransaction();
+        FoodMapFragment mapFragment = new FoodMapFragment();
+        mapFragment.SetupMarkerLocation(mLocation);
+        mapFragment.GetFoodPlaces(mPlaces);
+        fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
+
+    // shamelessly taken from Matt's SearchFragment code since I don't know this places stuff as well as he does
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+            = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                // Request did not complete successfully
+                Log.e("FoodTypeFragment: ", "Place query did not complete. Error: " + places.getStatus().toString());
+
+                return;
+            }
+            // Get the Place object from the buffer.
+            Place searchedFoodPlace = places.get(0);
+            mPlaces.add(searchedFoodPlace);
+
+            Log.i("FoodTypeFragment: ", "Place details received: " + searchedFoodPlace.getName());
+        }
+    };
 
     public void onClick(View v) {
         switch(v.getId()) {
@@ -109,7 +160,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 break;
             case R.id.foodtype_map_button:
                 String queryURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                        + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=2000"
+                        + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=3000"
                         + "&types=food&keyword=" + autoComplete.getText() + "&key="
                         + browserAPIKey;
                 Log.d("FoodTypeFragment: ", "URL: " + queryURL);
@@ -118,33 +169,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                /*try {
-                    URL queryURL = new URL(query);
-                    HttpsURLConnection urlConnection = (HttpsURLConnection) queryURL.openConnection();
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    urlConnection.
-                } catch (Exception e) {
-                    Log.d("Exception: ", "Problem occurred trying to use the Places Web API");
-                }*/
-                // This code adapted from a stack overflow answer seen here:
-                // http://stackoverflow.com/questions/14418021/get-text-from-web-page-to-string
-                // need to do this in an asynctask... sigh
-                /*String response = "";
-                DefaultHttpClient client = new DefaultHttpClient();
-                HttpGet httpGet = new HttpGet(queryURL);
-                try {
-                    HttpResponse execute = client.execute(httpGet);
-                    InputStream content = execute.getEntity().getContent();
-                    BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                    String s = "";
-                    while ((s = buffer.readLine()) != null) {
-                        response += s;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-                //ArrayList places = parseJSONForPlacesIDs(response);
-                //Log.d("FoodTypeFragment: ", "here are the json query results:" + response);
                 break;
         }
     }
@@ -170,6 +194,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 fragmentTransaction.commit();
                 break;
              */
+    // Thanks for the help, buddy
 
 
 
@@ -196,7 +221,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
 
         @Override
         protected void onPostExecute(String result) {
-            parseJSONForPlacesIDs(result);
+            parseJSONForPlaceIDs(result);
         }
     }
 }
