@@ -19,6 +19,24 @@
             android:textAlignment="center"
             android:gravity="center_horizontal" />
 
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/autocomplete_foodtype_search"
+            android:hint="What kind of food do you want?" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Search"
+            android:id="@+id/clear_foodtype_search_button" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Map it!"
+            android:id="@+id/foodtype_map_button" />
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

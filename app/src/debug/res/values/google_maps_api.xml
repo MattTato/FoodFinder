@@ -8,6 +8,9 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     You can also add your credentials to an existing key, using this line:
     87:3C:C2:50:A8:4C:E7:9A:99:02:AA:59:9E:22:9C:BC:08:F9:AA:5C;com.osu.tatoczenko.foodfinder
 
+    it seems that my (Marshall's) key is 6D:39:CB:2B:89:11:F9:09:BA:6D:1D:AB:47:2A:AA:17:D2:49:93:0D;com.osu.tatoczenko.foodfinder
+    and it fails the authentication for whatever reason
+
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.
     --></string>
