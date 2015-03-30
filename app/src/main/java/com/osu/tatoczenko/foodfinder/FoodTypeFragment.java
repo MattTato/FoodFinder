@@ -111,6 +111,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     }
 
     private void mapPlaces(ArrayList<String> places) {
+        mPlaces.clear();
         // Get the places by id
         int i = 0;
         for (i = 0; i < places.size(); i++) {
@@ -136,7 +137,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
             = new ResultCallback<PlaceBuffer>() {
         @Override
         public void onResult(PlaceBuffer places) {
-            mPlaces.clear();
             if (!places.getStatus().isSuccess()) {
                 // Request did not complete successfully
                 Log.e("FoodTypeFragment: ", "Place query did not complete. Error: " + places.getStatus().toString());
