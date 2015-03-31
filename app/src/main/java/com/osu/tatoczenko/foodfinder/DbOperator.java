@@ -39,7 +39,7 @@ public class DbOperator extends SQLiteOpenHelper {
 
         //not sure if I need this line below
 
-        //onCreate(db);
+        onCreate(db);
 
     }
 }
