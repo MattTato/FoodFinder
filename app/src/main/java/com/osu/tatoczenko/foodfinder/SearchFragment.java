@@ -1,10 +1,6 @@
 package com.osu.tatoczenko.foodfinder;
 
-import android.content.res.Resources;
 import android.location.Location;
-import android.net.Uri;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
@@ -16,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -24,19 +19,13 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
-import com.google.android.gms.location.places.PlaceTypes;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -59,6 +48,8 @@ public class SearchFragment extends Fragment implements OnClickListener{
     private AutocompleteFilter mFilter;
     private PlaceAutocompleteAdapter mAdapter;
     private static final String TAG = "PlaceAutoCompleteAdapt";
+    private static final String TAG2 = "TYLER";
+
     private LatLngBounds BOUNDS_FOOD_SEARCH;
 
     public SearchFragment() {
@@ -133,12 +124,15 @@ public class SearchFragment extends Fragment implements OnClickListener{
             final String placeId = String.valueOf(item.placeId);
             Log.i(TAG, "Autocomplete item selected: " + item.description);
 
+
+
             /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
               details about the place.
               */
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
+
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
         }
     };
@@ -159,6 +153,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
             }
             // Get the Place object from the buffer.
             searchedFoodPlace = places.get(0);
+            Log.i(TAG2,"test" + searchedFoodPlace);
             mPlaces.clear();
             mPlaces.add(searchedFoodPlace);
 

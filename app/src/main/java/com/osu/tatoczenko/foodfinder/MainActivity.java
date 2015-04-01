@@ -38,6 +38,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         createLocationRequest();
         mGoogleApiClient.connect();
 
+        //create database
+        DbOperator db = new DbOperator(this);
+
+
+
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
             menuFragment = new MainMenuFragment();
@@ -153,4 +158,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     public void onConnectionFailed(ConnectionResult connectionResult) {
         mGoogleApiClient.disconnect();
     }
+
+
+
+
 }

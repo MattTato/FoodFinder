@@ -14,14 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +25,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -42,13 +34,23 @@ import java.util.ArrayList;
  * The map fragment that will be used to display locations of restaurants.
  * Most of code taken from UIBasicsSample, as it handled a lot of the location setup information needed for the map already.
  */
-public class FoodMapFragment extends Fragment {
+public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener{
 
     private GoogleMap mMap;
     private static Marker mMarker;
 
+
+    private static final String TAG2 = "TestForLoc";
+    private static String INFO = null;
+    private static LatLng POSITION = null;
+    private static String TITLE= null;
+    public ArrayList<LatLng> zPlaces = new ArrayList<>();
+
     private static Location currentLocation;
     private ArrayList<Place> mPlaces = new ArrayList<>();
+
+    //private ArrayList<Place>sPlaces = new ArrayList<>();
+
     private MapFragment mapFragment;
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
@@ -60,8 +62,10 @@ public class FoodMapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_map, container, false);
+        View v = inflater.inflate(R.layout.fragment_map2, container, false);
         CloseKeyboard(v);
+
+
         return v;
     }
 
@@ -100,6 +104,9 @@ public class FoodMapFragment extends Fragment {
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+                mMap.setOnMarkerClickListener(this);
+
                 UiSettings mapSettings = mMap.getUiSettings();
                 mapSettings.setAllGesturesEnabled(true);
                 mapSettings.setZoomControlsEnabled(true);
@@ -112,7 +119,9 @@ public class FoodMapFragment extends Fragment {
                     @Override
                     public void onMapLoaded() {
                         AddFoodPlacesToMap();
+
                         ZoomCameraIn();
+
                     }
                 });
             }
@@ -144,9 +153,50 @@ public class FoodMapFragment extends Fragment {
                 // there definitely seems to be a dearth of info on this API currently,
                 // so I'm just throwing things at the wall here
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
+
+
             }
         }
     }
+@Override
+    public boolean onMarkerClick(Marker m) {
+    Marker bufferMarker = m;
+    POSITION=m.getPosition();
+    zPlaces.add(POSITION);
+
+
+    Log.i(TAG2,"this is a test" + zPlaces);
+
+
+    return false;
+}
+
+
+    public void onClick(View v){
+
+        switch(v.getId()){
+            case R.id.button2:
+                //AddToDatabase();
+
+                break;
+
+        }
+    }
+
+
+
+    public void AddToDatabase(){
+        for (Place place : mPlaces){
+            zPlaces.get(0);
+
+        }
+
+    }
+
+
+
+
+
 
     private void setMarkerByLocation(Location location){
         if(mMarker != null){

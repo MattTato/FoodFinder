@@ -87,6 +87,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
             case R.id.exit_button:
                 getActivity().finish();
                 break;
+
         }
     }
 }

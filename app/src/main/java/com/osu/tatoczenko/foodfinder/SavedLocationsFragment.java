@@ -8,6 +8,9 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
@@ -25,6 +28,8 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
     GoogleApiClient mGoogleApiClient;
     Location mLocation;
     ArrayList<Place> mPlaces = new ArrayList<>();
+
+
 
     public SavedLocationsFragment() {
         // Required empty public constructor
@@ -47,6 +52,13 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
         View btnBack = v.findViewById(R.id.savedlocback_button);
         btnBack.setOnClickListener(this);
         return v;
+
+
+
+
+
+
+
     }
 
     public void onClick(View v){

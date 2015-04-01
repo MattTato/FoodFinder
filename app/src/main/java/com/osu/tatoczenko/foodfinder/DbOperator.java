@@ -1,25 +1,30 @@
 package com.osu.tatoczenko.foodfinder;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.Cursor;
 
 /**
  * Created by tyler_cunnington on 3/30/15.
  */
 public class DbOperator extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
-    private static final String DATABASE_NAME = "MarkerLocations";
-    private static final String KEY_REST_NAME = "name";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "MarkerLocationsSQLite";
+    private static final String ROW_ID = "_id";
+    private static final String KEY_REST_TAG = "rest_tag";
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LATITUDE = "latitude";
+    private static final String DATABASE_TABLE = "locations";
 
-    private static final String TABLE_CREATE = "CREATE TABLE" + DATABASE_NAME + " (" + KEY_REST_NAME + "TEXT, "
-            + KEY_LONGITUDE + "FLOAT, " + KEY_LATITUDE + "FLOAT);";
+    private static final String TABLE_CREATE = "CREATE TABLE" + DATABASE_TABLE + " (" + ROW_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + "DOUBLE, " + KEY_LATITUDE + "DOUBLE)";
 
 
-    DbOperator (Context context){
+
+    public DbOperator (Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
@@ -34,12 +39,21 @@ public class DbOperator extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
+        //db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
 
 
-        //not sure if I need this line below
+        //not sure if I need these lines
 
-        onCreate(db);
+        //onCreate(db);
 
     }
+
+
+
+
+
+
+
+
+
 }
