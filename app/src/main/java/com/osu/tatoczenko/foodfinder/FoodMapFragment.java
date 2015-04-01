@@ -135,6 +135,14 @@ public class FoodMapFragment extends Fragment {
     private void AddFoodPlacesToMap(){
         if(mPlaces != null) {
             for (Place place : mPlaces) {
+                // addMarker seems to return the Marker that it adds
+                // perhaps you can gather the markers in a list and add clicklisteners to them?
+                // then when one is clicked offer the ability to save it to favorites?
+                // I see that you have a favorite button in the UI already...
+                // perhaps when a marker is clicked you can "preload" it and make it ready to
+                // favorite, but only truly save it when the favorite button is clicked?
+                // there definitely seems to be a dearth of info on this API currently,
+                // so I'm just throwing things at the wall here
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
             }
         }
