@@ -1,7 +1,10 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.app.FragmentTransaction;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,17 +38,21 @@ import java.util.ArrayList;
  * The map fragment that will be used to display locations of restaurants.
  * Most of code taken from UIBasicsSample, as it handled a lot of the location setup information needed for the map already.
  */
-public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener{
+public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
     private GoogleMap mMap;
     private static Marker mMarker;
 
 
     private static final String TAG2 = "TestForLoc";
+    private static String TAG3 = "FavButton Test";
     private static String INFO = null;
     private static LatLng POSITION = null;
-    private static String TITLE= null;
-    public ArrayList<LatLng> zPlaces = new ArrayList<>();
+    private static String TITLE = null;
+    public ArrayList<LatLng> pPlaces = new ArrayList<>();
+    public ArrayList<String> nPlaces = new ArrayList<>();
+    public static int i=-1;
+
 
     private static Location currentLocation;
     private ArrayList<Place> mPlaces = new ArrayList<>();
@@ -63,7 +71,14 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map2, container, false);
+
+
+        View btnFav = v.findViewById(R.id.favorite_button);
+        btnFav.setOnClickListener(this);
+
         CloseKeyboard(v);
+
+
 
 
         return v;
@@ -85,13 +100,15 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         super.onPause();
     }
 
-    public void SetupMarkerLocation(Location location){
+    public void SetupMarkerLocation(Location location) {
         currentLocation = location;
     }
 
-    public void GetFoodPlaces(ArrayList<Place> places) { mPlaces = places; }
+    public void GetFoodPlaces(ArrayList<Place> places) {
+        mPlaces = places;
+    }
 
-    private void CloseKeyboard(View v){
+    private void CloseKeyboard(View v) {
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
@@ -128,11 +145,11 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    private void ZoomCameraIn(){
-        if(mPlaces != null){
+    private void ZoomCameraIn() {
+        if (mPlaces != null) {
             LatLngBounds.Builder cameraBoundsBuilder = new LatLngBounds.Builder();
             cameraBoundsBuilder.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
-            for(Place place : mPlaces) {
+            for (Place place : mPlaces) {
                 cameraBoundsBuilder.include(place.getLatLng());
             }
             LatLngBounds cameraBounds = cameraBoundsBuilder.build();
@@ -141,8 +158,8 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    private void AddFoodPlacesToMap(){
-        if(mPlaces != null) {
+    private void AddFoodPlacesToMap() {
+        if (mPlaces != null) {
             for (Place place : mPlaces) {
                 // addMarker seems to return the Marker that it adds
                 // perhaps you can gather the markers in a list and add clicklisteners to them?
@@ -158,25 +175,35 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
             }
         }
     }
-@Override
+
+    @Override
     public boolean onMarkerClick(Marker m) {
-    Marker bufferMarker = m;
-    POSITION=m.getPosition();
-    zPlaces.add(POSITION);
+        //i++ needed to keep track in list to make sure we get info from the most recently pressed marker
+        i++;
+        Marker bufferMarker = m;
+        POSITION = m.getPosition();
+        TITLE = m.getTitle();
+        pPlaces.add(POSITION);
+        nPlaces.add(TITLE);
+
+//quick test to make sure we are getting the right information from the marker
+        Log.i(TAG2, "test for Name" + nPlaces.get(i));
+        Log.i(TAG2, "test for coords" + pPlaces.get(i));
 
 
-    Log.i(TAG2,"this is a test" + zPlaces);
+        return false;
+    }
 
 
-    return false;
-}
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.favorite_button:
+                //test to see if we are getting info from the last marker pressed.
+                Log.i(TAG3,"testFavCoord" + pPlaces.get(i));
+                Log.i(TAG3,"testFavName" + nPlaces.get(i));
 
-
-    public void onClick(View v){
-
-        switch(v.getId()){
-            case R.id.button2:
-                //AddToDatabase();
+                DbOperator db = new DbOperator(v.getContext());
+                db.addToDatabase(pPlaces.get(i), nPlaces.get(i));
 
                 break;
 
@@ -185,13 +212,6 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
 
 
-    public void AddToDatabase(){
-        for (Place place : mPlaces){
-            zPlaces.get(0);
-
-        }
-
-    }
 
 
 

@@ -8,7 +8,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Favorite"
-        android:id="@+id/button2" />
+        android:id="@+id/favorite_button"
+        android:clickable="false" />
 
     <FrameLayout
         android:layout_width="fill_parent"

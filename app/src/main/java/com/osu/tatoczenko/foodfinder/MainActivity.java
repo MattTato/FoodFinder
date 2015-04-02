@@ -28,6 +28,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     Location mLocation;
     LocationRequest mLocationRequest;
     MainMenuFragment menuFragment;
+    protected DbOperator _db = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         //create database
         DbOperator db = new DbOperator(this);
+        _db=db;
 
 
 
