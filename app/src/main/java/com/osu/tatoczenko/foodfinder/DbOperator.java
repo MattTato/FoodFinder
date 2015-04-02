@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -20,12 +21,18 @@ public class DbOperator extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LATITUDE = "latitude";
     private static final String DATABASE_TABLE = "locations";
+    private static final Place PLACE_OBJ = null;
 
-    // This SQL query had syntax errors, that was the error that you were getting
-    // I fixed them
-    // - Marshall
+
+
+    private static final String[] COLUMNS = {KEY_REST_TAG,KEY_LONGITUDE,KEY_LATITUDE};
+
     private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + " DOUBLE, " + KEY_LATITUDE + " DOUBLE)";
+
+
+    /*private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + PLACE_OBJ + " PLACE)";*/
 
 
 
@@ -67,15 +74,35 @@ public class DbOperator extends SQLiteOpenHelper {
 
         db.close();
 
+    }
 
+    //what i think the method would look like if we can pass just the object instead of the lat long and name like we did above.
+
+
+   /*public void addToDatabase(Place p){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(PLACE_OBJ, p);                       //<-----this line draws an error though....
+
+        db.insert(DATABASE_TABLE,null,values);
+
+        db.close();
+
+    }*/
+
+
+    public void getFromTable(int id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+                Cursor cursor = db.query(DbOperator.DATABASE_TABLE,COLUMNS,"1=?",new String[]{"1"},null,null,null,null);
+
+        if (cursor !=null)
+            cursor.moveToFirst();
 
 
 
     }
-
-
-
-
 
 
 

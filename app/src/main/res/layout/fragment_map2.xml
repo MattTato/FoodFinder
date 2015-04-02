@@ -11,6 +11,15 @@
         android:id="@+id/favorite_button"
         android:clickable="false" />
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:layout_gravity="right"
+        android:text="Click Map Marker Then Favorite Button to Save Restaurant"
+        android:textSize="12dp"
+        android:textStyle="bold" />
+
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

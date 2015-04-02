@@ -49,14 +49,12 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_saved_locations, container, false);
+
         View btnBack = v.findViewById(R.id.savedlocback_button);
         btnBack.setOnClickListener(this);
+
+
         return v;
-
-
-
-
-
 
 
     }
@@ -66,6 +64,16 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             case R.id.savedlocback_button:
                 getFragmentManager().popBackStack();
                 break;
+            //case R.id.favorite_button:
+                //Button myButton = new Button(this);
+                //myButton.setText("NEW Added Button");
+                //LinearLayout ll = (LinearLayout)findViewById(R.id.buttonlayout);
+                //LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                //ll.addView(myButton, lp);
+
+
+
+                //break;
 
             /*
             Add the below code to whatever sort of button system you decide to implement. You may want each saved location to be its own button, but that's just my thought on it.

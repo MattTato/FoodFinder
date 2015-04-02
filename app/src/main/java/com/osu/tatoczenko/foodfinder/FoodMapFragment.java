@@ -45,13 +45,19 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
 
     private static final String TAG2 = "TestForLoc";
+
     private static String TAG3 = "FavButton Test";
+    private static String TAG4 = "zplace";
+    
     private static String INFO = null;
     private static LatLng POSITION = null;
     private static String TITLE = null;
     public ArrayList<LatLng> pPlaces = new ArrayList<>();
     public ArrayList<String> nPlaces = new ArrayList<>();
     public static int i=-1;
+
+    Place zPlace;
+
 
     private Marker lastMarkerClicked;
 
@@ -179,17 +185,17 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     @Override
     public boolean onMarkerClick(Marker m) {
-        //i++ needed to keep track in list to make sure we get info from the most recently pressed marker
-        i++;
+        //The i++ is needed to keep track in list to make sure we get info from the most recently pressed marker
+        //i++;
 
-        POSITION = m.getPosition();
-        TITLE = m.getTitle();
-        pPlaces.add(POSITION);
-        nPlaces.add(TITLE);
+        //POSITION = m.getPosition();
+        //TITLE = m.getTitle();
+       // pPlaces.add(POSITION);
+        //nPlaces.add(TITLE);
 
 //quick test to make sure we are getting the right information from the marker
-        Log.i(TAG2, "test for Name" + nPlaces.get(i));
-        Log.i(TAG2, "test for coords" + pPlaces.get(i));
+        //Log.i(TAG2, "test for Name" + nPlaces.get(i));
+        //Log.i(TAG2, "test for coords" + pPlaces.get(i));
 
         // Alternatively, this method could only have this single line of code (and the return)
         // which would save the last marker clicked (no need to save every marker that is clicked)
@@ -205,10 +211,26 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         switch (v.getId()) {
             case R.id.favorite_button:
                 //test to see if we are getting info from the last marker pressed.
-                Log.i(TAG3,"testFavCoord" + pPlaces.get(i));
-                Log.i(TAG3,"testFavName" + nPlaces.get(i));
+               // Log.i(TAG3,"testFavCoord" + pPlaces.get(i));
+               // Log.i(TAG3,"testFavName" + nPlaces.get(i));
+
+                int p = 0;
+                for (p = 0; p < mPlaces.size(); p++) {
+                    LatLng markerLatLng = lastMarkerClicked.getPosition();
+                    if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
+                    zPlace=mPlaces.get(p);
+                        Log.i(TAG4,"test"+ zPlace);
+                        break;
+
+                    }
+
+                }
+
                 DbOperator db = new DbOperator(v.getContext());
-                db.addToDatabase(pPlaces.get(i), nPlaces.get(i));
+                //db.addToDatabase(zPlace);
+                db.addToDatabase(lastMarkerClicked.getPosition(),lastMarkerClicked.getTitle());
+                //db.addToDatabase(pPlaces.get(i), nPlaces.get(i));
+
 
 
                 // If there is something in the lastMarkerClicked variable, the following code
@@ -216,15 +238,10 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 // lastMarkerClicked variable
                 // - Marshall
 
-                /*int p = 0;
-                for (p = 0; p < mPlaces.size(); p++) {
-                    LatLng markerLatLng = lastMarkerClicked.getPosition();
-                    if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
-                        break;
-                    }
-                }
-                Log.d("YO LOOK HERE", "You wish to save the location " + lastMarkerClicked.getTitle());
-                Log.d("YO LOOK HERE", "which should match " + mPlaces.get(p).getName());*/
+
+
+                //Log.d("YO LOOK HERE", "You wish to save the location " + lastMarkerClicked.getTitle());
+                //Log.d("YO LOOK HERE", "which should match " + mPlaces.get(p).getName());
 
 
                break;
