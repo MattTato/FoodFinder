@@ -9,32 +9,37 @@ import android.database.Cursor;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by tyler_cunnington on 3/30/15.
  */
 public class DbOperator extends SQLiteOpenHelper {
 
+    //database version
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "MarkerLocationsSQLite";
-    private static final String ROW_ID = "_id";
-    private static final String KEY_REST_TAG = "rest_tag";
-    private static final String KEY_LONGITUDE = "longitude";
-    private static final String KEY_LATITUDE = "latitude";
+    //database name
+    private static final String DATABASE_NAME = "LocationsSQLite";
+    //table name
     private static final String DATABASE_TABLE = "locations";
-    private static final Place PLACE_OBJ = null;
+    //table columns
+    private static final String KEY_ID = "id";
+    private static final String KEY_REST_ID = "restID";
 
 
 
-    private static final String[] COLUMNS = {KEY_REST_TAG,KEY_LONGITUDE,KEY_LATITUDE};
 
-    private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + " DOUBLE, " + KEY_LATITUDE + " DOUBLE)";
+
+    private static final String[] COLUMNS = {KEY_ID,KEY_REST_ID};
+
+    /*private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + " DOUBLE, " + KEY_LATITUDE + " DOUBLE)";*/
 
     /*
     You will need to use a BLOB for the Place object, not a PLACE. Pretty sure SQLite has no idea what a PLACE primitive is.
     private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + PLACE_OBJ + " BLOB)";*/
-
 
 
     public DbOperator (Context context){
@@ -43,6 +48,7 @@ public class DbOperator extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_REST_ID + " TEXT" + ")";
         db.execSQL(TABLE_CREATE);
     }
 
@@ -50,58 +56,68 @@ public class DbOperator extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
 
 
         //not sure if I need these lines
 
-        //onCreate(db);
+        onCreate(db);
 
     }
 
-
-    public void addToDatabase(LatLng restLat,String restName){
+//add stuff to database
+    public void addToDatabase(String restaurantId){
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_REST_TAG, restName);
-        values.put(KEY_LONGITUDE,restLat.longitude);
-        values.put(KEY_LATITUDE,restLat.latitude);
-
+        values.put(KEY_REST_ID,restaurantId);
         db.insert(DATABASE_TABLE,null,values);
-
         db.close();
 
     }
 
-    //what i think the method would look like if we can pass just the object instead of the lat long and name like we did above.
 
-
-   /*public void addToDatabase(Place p){
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(PLACE_OBJ, p);                       //<-----this line draws an error though....
-
-        db.insert(DATABASE_TABLE,null,values);
-
-        db.close();
-
-    }*/
-
-
-    public void getFromTable(int id){
+//read a single row in database
+    public Location getFromTable(int id){
 
         SQLiteDatabase db = this.getReadableDatabase();
-                Cursor cursor = db.query(DbOperator.DATABASE_TABLE,COLUMNS,"1=?",new String[]{"1"},null,null,null,null);
-
+        Cursor cursor = db.query(DATABASE_TABLE, new String[] {KEY_ID,KEY_REST_ID},KEY_ID + "=?", new String[]{String.valueOf(id)},null,null,null,null);
         if (cursor !=null)
             cursor.moveToFirst();
 
-
+        Location location = new Location(Integer.parseInt(cursor.getString(0)),cursor.getString(1));
+        return location;
 
     }
 
+    // will return all rows from database in an array list
+
+    public List<Location> getAllLoc(){
+        List<Location> locList = new ArrayList<Location>();
+        //select all query
+        String selectQuery = "SELECT * FROM " + DATABASE_TABLE;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery,null);
+
+        if (cursor.moveToFirst()){
+            do{
+                Location location = new Location();
+                location.setId(Integer.parseInt(cursor.getString(0)));
+                location.setRestId(cursor.getString(1));
+                locList.add(location);
+            } while (cursor.moveToNext());
+
+
+        }
+        //return list
+        return locList;
+
+
+
+
+
+    }
 
 
 }

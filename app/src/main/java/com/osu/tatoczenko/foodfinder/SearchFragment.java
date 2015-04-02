@@ -120,9 +120,12 @@ public class SearchFragment extends Fragment implements OnClickListener{
              The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
              read the place ID.
               */
+
             final PlaceAutocompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+
             final String placeId = String.valueOf(item.placeId);
             Log.i(TAG, "Autocomplete item selected: " + item.description);
+            Log.i(TAG, "Autocomplete item selected: " + placeId);
 
             /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional

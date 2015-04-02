@@ -20,6 +20,8 @@ import com.google.android.gms.location.LocationServices;
 
 import com.google.android.gms.location.places.Places;
 
+import java.util.List;
+
 
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
     String message = "Android_Log_Test : ";
@@ -28,7 +30,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     Location mLocation;
     LocationRequest mLocationRequest;
     MainMenuFragment menuFragment;
-    protected DbOperator _db = null;
+    //protected DbOperator _db = null;
 
 
     @Override
@@ -42,7 +44,19 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         //create database
         DbOperator db = new DbOperator(this);
-        _db=db;
+        //_db=db;
+
+        //reading all entries from database
+        Log.d("Reading: ", "Reading ALL Entries..");
+        List<com.osu.tatoczenko.foodfinder.Location> locations = db.getAllLoc();
+
+        for (com.osu.tatoczenko.foodfinder.Location loc : locations){
+            String log = "Id: " + loc.getId() + " ,RestID: " + loc.getRestId();
+            Log.d("TYLER: ",log);
+        }
+
+
+
 
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
