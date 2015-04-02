@@ -167,10 +167,8 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     @Override
     public boolean onMarkerClick(Marker m) {
-
+    //lastClickedMarker
         lastMarkerClicked = m;
-
-
         return false;
     }
 
@@ -178,9 +176,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.favorite_button:
-
-
-                int p = 0;
+                 int p = 0;
                 for (p = 0; p < mPlaces.size(); p++) {
                     LatLng markerLatLng = lastMarkerClicked.getPosition();
                     if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
@@ -193,29 +189,12 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     }
 
                 }
-
+                //placeID of place they want to favorite
                 zPlaceId = String.valueOf(zPlace.getId());
 
                 DbOperator db = new DbOperator(v.getContext());
                 db.addToDatabase(zPlaceId);
-
-
-
-
-
-
-                // If there is something in the lastMarkerClicked variable, the following code
-                // will find the matching Place object based on the LatLng object from the
-                // lastMarkerClicked variable
-                // - Marshall
-
-
-
-                //Log.d("YO LOOK HERE", "You wish to save the location " + lastMarkerClicked.getTitle());
-                //Log.d("YO LOOK HERE", "which should match " + mPlaces.get(p).getName());
-
-
-               break;
+                break;
 
         }
     }

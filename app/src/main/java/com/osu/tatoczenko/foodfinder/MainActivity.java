@@ -46,14 +46,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         DbOperator db = new DbOperator(this);
         //_db=db;
 
-        //reading all entries from database
-        Log.d("Reading: ", "Reading ALL Entries..");
-        List<com.osu.tatoczenko.foodfinder.Location> locations = db.getAllLoc();
 
-        for (com.osu.tatoczenko.foodfinder.Location loc : locations){
-            String log = "Id: " + loc.getId() + " ,RestID: " + loc.getRestId();
-            Log.d("TYLER: ",log);
-        }
 
 
 
@@ -72,6 +65,15 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     protected void onStart() {
         super.onStart();
         Log.d(message, "The onStart() event");
+        //reading all entries from database
+        Log.d("Reading: ", "Reading ALL Entries..");
+        DbOperator db = new DbOperator(this);
+        List<com.osu.tatoczenko.foodfinder.Location> locations = db.getAllLoc();
+
+        for (com.osu.tatoczenko.foodfinder.Location loc : locations){
+            String log = "Id: " + loc.getId() + " ,RestID: " + loc.getRestId();
+            Log.d("TYLER: ",log);
+        }
     }
 
     @Override
