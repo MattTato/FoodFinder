@@ -30,6 +30,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     MainMenuFragment menuFragment;
     protected DbOperator _db = null;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +43,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         //create database
         DbOperator db = new DbOperator(this);
         _db=db;
+
 
 
 

@@ -205,7 +205,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 DbOperator db = new DbOperator(v.getContext());
                 db.addToDatabase(pPlaces.get(i), nPlaces.get(i));
 
-                break;
+               break;
 
         }
     }
