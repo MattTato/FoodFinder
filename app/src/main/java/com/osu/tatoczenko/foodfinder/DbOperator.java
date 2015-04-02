@@ -30,22 +30,20 @@ public class DbOperator extends SQLiteOpenHelper {
     private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + " DOUBLE, " + KEY_LATITUDE + " DOUBLE)";
 
-
-    /*private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + PLACE_OBJ + " PLACE)";*/
+    /*
+    You will need to use a BLOB for the Place object, not a PLACE. Pretty sure SQLite has no idea what a PLACE primitive is.
+    private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + PLACE_OBJ + " BLOB)";*/
 
 
 
     public DbOperator (Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_CREATE);
-
-
     }
 
 

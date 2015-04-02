@@ -124,15 +124,13 @@ public class SearchFragment extends Fragment implements OnClickListener{
             final String placeId = String.valueOf(item.placeId);
             Log.i(TAG, "Autocomplete item selected: " + item.description);
 
-
-
             /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
               details about the place.
               */
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
-
+            // Will be called after we get results from the Places API about the place with the ID we sent it
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
         }
     };
@@ -154,26 +152,13 @@ public class SearchFragment extends Fragment implements OnClickListener{
             // Get the Place object from the buffer.
             searchedFoodPlace = places.get(0);
             Log.i(TAG2,"test" + searchedFoodPlace);
+            // Add this Place object into the ArrayList for easy passing into the FoodMapFragment
             mPlaces.clear();
             mPlaces.add(searchedFoodPlace);
-
-            /* Format details of the place for display and show it in a TextView.
-            mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(),
-                    place.getId(), place.getAddress(), place.getPhoneNumber(),
-                    place.getWebsiteUri())); */
 
             Log.i(TAG, "Place details received: " + searchedFoodPlace.getName());
         }
     };
-
-    /*private static Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
-                                              CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
-        Log.e(TAG, res.getString(R.string.place_details, name, id, address, phoneNumber,
-                websiteUri));
-        return Html.fromHtml(res.getString(R.string.place_details, name, id, address, phoneNumber,
-                websiteUri));
-
-    } */
 
     public void onClick(View v){
         FragmentManager fragmentManager = getFragmentManager();
@@ -196,6 +181,4 @@ public class SearchFragment extends Fragment implements OnClickListener{
                 break;
         }
     }
-
-
 }

@@ -58,7 +58,6 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     Place zPlace;
 
-
     private Marker lastMarkerClicked;
 
     private static Location currentLocation;
@@ -78,16 +77,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map2, container, false);
-
-
         View btnFav = v.findViewById(R.id.favorite_button);
         btnFav.setOnClickListener(this);
-
         CloseKeyboard(v);
-
-
-
-
         return v;
     }
 
@@ -128,9 +120,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
                 mMap.setOnMarkerClickListener(this);
-
                 UiSettings mapSettings = mMap.getUiSettings();
                 mapSettings.setAllGesturesEnabled(true);
                 mapSettings.setZoomControlsEnabled(true);
@@ -143,9 +133,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     @Override
                     public void onMapLoaded() {
                         AddFoodPlacesToMap();
-
                         ZoomCameraIn();
-
                     }
                 });
             }
@@ -168,17 +156,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private void AddFoodPlacesToMap() {
         if (mPlaces != null) {
             for (Place place : mPlaces) {
-                // addMarker seems to return the Marker that it adds
-                // perhaps you can gather the markers in a list and add clicklisteners to them?
-                // then when one is clicked offer the ability to save it to favorites?
-                // I see that you have a favorite button in the UI already...
-                // perhaps when a marker is clicked you can "preload" it and make it ready to
-                // favorite, but only truly save it when the favorite button is clicked?
-                // there definitely seems to be a dearth of info on this API currently,
-                // so I'm just throwing things at the wall here
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
-
-
             }
         }
     }
@@ -193,7 +171,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
        // pPlaces.add(POSITION);
         //nPlaces.add(TITLE);
 
-//quick test to make sure we are getting the right information from the marker
+        //quick test to make sure we are getting the right information from the marker
         //Log.i(TAG2, "test for Name" + nPlaces.get(i));
         //Log.i(TAG2, "test for coords" + pPlaces.get(i));
 
@@ -201,8 +179,6 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         // which would save the last marker clicked (no need to save every marker that is clicked)
         // - Marshall
         lastMarkerClicked = m;
-
-
         return false;
     }
 
