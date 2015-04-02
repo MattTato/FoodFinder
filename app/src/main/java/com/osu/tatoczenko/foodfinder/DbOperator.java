@@ -21,9 +21,11 @@ public class DbOperator extends SQLiteOpenHelper {
     private static final String KEY_LATITUDE = "latitude";
     private static final String DATABASE_TABLE = "locations";
 
-
-    private static final String TABLE_CREATE = "CREATE TABLE" + DATABASE_TABLE + " (" + ROW_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + "DOUBLE, " + KEY_LATITUDE + "DOUBLE)";
+    // This SQL query had syntax errors, that was the error that you were getting
+    // I fixed them
+    // - Marshall
+    private static final String TABLE_CREATE = "CREATE TABLE " + DATABASE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_REST_TAG + " TEXT, " + KEY_LONGITUDE + " DOUBLE, " + KEY_LATITUDE + " DOUBLE)";
 
 
 

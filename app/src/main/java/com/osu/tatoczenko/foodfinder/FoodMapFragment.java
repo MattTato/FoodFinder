@@ -53,6 +53,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public ArrayList<String> nPlaces = new ArrayList<>();
     public static int i=-1;
 
+    private Marker lastMarkerClicked;
 
     private static Location currentLocation;
     private ArrayList<Place> mPlaces = new ArrayList<>();
@@ -180,7 +181,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public boolean onMarkerClick(Marker m) {
         //i++ needed to keep track in list to make sure we get info from the most recently pressed marker
         i++;
-        Marker bufferMarker = m;
+
         POSITION = m.getPosition();
         TITLE = m.getTitle();
         pPlaces.add(POSITION);
@@ -189,6 +190,11 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 //quick test to make sure we are getting the right information from the marker
         Log.i(TAG2, "test for Name" + nPlaces.get(i));
         Log.i(TAG2, "test for coords" + pPlaces.get(i));
+
+        // Alternatively, this method could only have this single line of code (and the return)
+        // which would save the last marker clicked (no need to save every marker that is clicked)
+        // - Marshall
+        lastMarkerClicked = m;
 
 
         return false;
@@ -201,9 +207,25 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 //test to see if we are getting info from the last marker pressed.
                 Log.i(TAG3,"testFavCoord" + pPlaces.get(i));
                 Log.i(TAG3,"testFavName" + nPlaces.get(i));
-
                 DbOperator db = new DbOperator(v.getContext());
                 db.addToDatabase(pPlaces.get(i), nPlaces.get(i));
+
+
+                // If there is something in the lastMarkerClicked variable, the following code
+                // will find the matching Place object based on the LatLng object from the
+                // lastMarkerClicked variable
+                // - Marshall
+
+                /*int p = 0;
+                for (p = 0; p < mPlaces.size(); p++) {
+                    LatLng markerLatLng = lastMarkerClicked.getPosition();
+                    if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
+                        break;
+                    }
+                }
+                Log.d("YO LOOK HERE", "You wish to save the location " + lastMarkerClicked.getTitle());
+                Log.d("YO LOOK HERE", "which should match " + mPlaces.get(p).getName());*/
+
 
                break;
 
