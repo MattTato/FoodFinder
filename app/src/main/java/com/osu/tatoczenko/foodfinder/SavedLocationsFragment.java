@@ -2,6 +2,7 @@ package com.osu.tatoczenko.foodfinder;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
@@ -76,6 +78,16 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             savedLocButton.setOnClickListener(this);
             numOfPlaces++;
             savedLocLL.addView(savedLocButton);
+        }
+        if(numOfPlaces == 0){
+            TextView textView = new TextView(getActivity());
+            textView.setTextColor(getResources().getColor(android.R.color.black));
+            textView.setTextSize(20f);
+            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            textView.setLayoutParams(textParams);
+            textView.setText("You don't seem to have any saved locations");
+            textView.setGravity(Gravity.CENTER_HORIZONTAL);
+            savedLocLL.addView(textView);
         }
         return v;
     }

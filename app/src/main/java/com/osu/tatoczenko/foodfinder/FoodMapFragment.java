@@ -41,31 +41,16 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private GoogleMap mMap;
     private static Marker mMarker;
 
-
-    private static final String TAG2 = "TestForLoc";
-
-    private static String TAG3 = "FavButton Test";
     private static String TAG4 = "zplaceIDis.....";
-    private static String TAG5 = "dataTest";
-    
-    private static String INFO = null;
-    private static LatLng POSITION = null;
-    private static String TITLE = null;
-    public ArrayList<LatLng> pPlaces = new ArrayList<>();
-    public ArrayList<String> nPlaces = new ArrayList<>();
     public static int i=-1;
 
     Place zPlace;
     String zPlaceId=null;
-    String entry=null;
-
 
     private Marker lastMarkerClicked;
 
     private static Location currentLocation;
     private ArrayList<Place> mPlaces = new ArrayList<>();
-
-    //private ArrayList<Place>sPlaces = new ArrayList<>();
 
     private MapFragment mapFragment;
     private final String TAG = ((Object) this).getClass().getSimpleName();
