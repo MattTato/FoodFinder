@@ -6,9 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,35 +54,43 @@ public class DbOperator extends SQLiteOpenHelper {
 
     }
 
-//add stuff to database
-    public void addToDatabase(String restaurantId){
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_REST_ID,restaurantId);
-        db.insert(DATABASE_TABLE,null,values);
-        db.close();
-
+    //add stuff to database
+    public boolean addToDatabase(String restaurantId){
+        List<SavedFoodLocation> savedLocList = getAllLoc();
+        boolean canAddToDatabase = true;
+        for(SavedFoodLocation savedLoc : savedLocList){
+            if(savedLoc.getRestId().equals(restaurantId)){
+                canAddToDatabase = false;
+            }
+        }
+        if(canAddToDatabase) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_REST_ID, restaurantId);
+            db.insert(DATABASE_TABLE, null, values);
+            db.close();
+        }
+        return canAddToDatabase;
     }
 
 
-//read a single row in database
-    public Location getFromTable(int id){
+    //read a single row in database
+    public SavedFoodLocation getFromTable(int id){
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(DATABASE_TABLE, new String[] {KEY_ID,KEY_REST_ID},KEY_ID + "=?", new String[]{String.valueOf(id)},null,null,null,null);
         if (cursor !=null)
             cursor.moveToFirst();
 
-        Location location = new Location(Integer.parseInt(cursor.getString(0)),cursor.getString(1));
+        SavedFoodLocation location = new SavedFoodLocation(Integer.parseInt(cursor.getString(0)),cursor.getString(1));
         return location;
 
     }
 
     // will return all rows from database in an array list
 
-    public List<Location> getAllLoc(){
-        List<Location> locList = new ArrayList<Location>();
+    public List<SavedFoodLocation> getAllLoc(){
+        List<SavedFoodLocation> locList = new ArrayList<SavedFoodLocation>();
         //select all query
         String selectQuery = "SELECT * FROM " + DATABASE_TABLE;
 
@@ -94,7 +99,7 @@ public class DbOperator extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()){
             do{
-                Location location = new Location();
+                SavedFoodLocation location = new SavedFoodLocation();
                 location.setId(Integer.parseInt(cursor.getString(0)));
                 location.setRestId(cursor.getString(1));
                 locList.add(location);
@@ -104,12 +109,5 @@ public class DbOperator extends SQLiteOpenHelper {
         }
         //return list
         return locList;
-
-
-
-
-
     }
-
-
 }

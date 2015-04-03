@@ -1,10 +1,7 @@
 package com.osu.tatoczenko.foodfinder;
 
 
-import android.app.FragmentTransaction;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 
 import com.google.android.gms.location.places.Place;
@@ -80,7 +78,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_map2, container, false);
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
         View btnFav = v.findViewById(R.id.favorite_button);
         btnFav.setOnClickListener(this);
         CloseKeyboard(v);
@@ -150,6 +148,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
             cameraBoundsBuilder.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
             for (Place place : mPlaces) {
                 cameraBoundsBuilder.include(place.getLatLng());
+                Log.d((String)place.getName(), place.getLatLng().toString());
             }
             LatLngBounds cameraBounds = cameraBoundsBuilder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraBounds, 0));
@@ -176,36 +175,32 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.favorite_button:
-                 int p = 0;
+                int p = 0;
                 for (p = 0; p < mPlaces.size(); p++) {
                     LatLng markerLatLng = lastMarkerClicked.getPosition();
                     if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
-                    zPlace=mPlaces.get(p);
+                        zPlace = mPlaces.get(p);
 
-
-                        Log.i(TAG4,zPlace.getId());
+                        Log.i(TAG4, zPlace.getId());
                         break;
-
                     }
-
                 }
                 //placeID of place they want to favorite
                 zPlaceId = String.valueOf(zPlace.getId());
 
                 DbOperator db = new DbOperator(v.getContext());
-                db.addToDatabase(zPlaceId);
+                if(db.addToDatabase(zPlaceId)){
+                    CharSequence textToDisplay = zPlace.getName() + " has been saved!";
+                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
+                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 break;
-
         }
     }
-
-
-
-
-
-
-
-
 
     private void setMarkerByLocation(Location location){
         if(mMarker != null){

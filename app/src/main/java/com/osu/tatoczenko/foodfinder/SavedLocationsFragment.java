@@ -1,7 +1,10 @@
 package com.osu.tatoczenko.foodfinder;
 
-
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.location.Location;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -10,13 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
 
 import java.util.ArrayList;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,8 +29,10 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
     GoogleApiClient mGoogleApiClient;
     Location mLocation;
     ArrayList<Place> mPlaces = new ArrayList<>();
+    Place savedFoodPlace;
+    int numOfPlaces;
 
-
+    private static final String TAG = "PlaceAutoCompleteAdapt";
 
     public SavedLocationsFragment() {
         // Required empty public constructor
@@ -43,6 +46,10 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
         mGoogleApiClient = googleApiClient;
     }
 
+    public void UpdatePlacesList(ArrayList<Place> places){
+        mPlaces = places;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,10 +60,24 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
         View btnBack = v.findViewById(R.id.savedlocback_button);
         btnBack.setOnClickListener(this);
 
+        // Get the inner LinearLayout of the SavedLocationsFragment layout to fill with buttons
+        LinearLayout savedLocLL = (LinearLayout)v.findViewById(R.id.savedloc_LL);
+        LinearLayout.LayoutParams savedLocButtonParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
+        // If there are places, fill the layout with buttons!
+        numOfPlaces = 0;
+        for(Place places : mPlaces){
+            Log.d("Place name", (String)places.getName());
+            Button savedLocButton = new Button(getActivity());
+            savedLocButton.setLayoutParams(savedLocButtonParams);
+            savedLocButton.setGravity(Gravity.CENTER_HORIZONTAL);
+            savedLocButton.setText(places.getName() + ": " + places.getAddress());
+            savedLocButton.setId(numOfPlaces);
+            savedLocButton.setOnClickListener(this);
+            numOfPlaces++;
+            savedLocLL.addView(savedLocButton);
+        }
         return v;
-
-
     }
 
     public void onClick(View v){
@@ -64,34 +85,26 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             case R.id.savedlocback_button:
                 getFragmentManager().popBackStack();
                 break;
-            //case R.id.favorite_button:
-                //Button myButton = new Button(this);
-                //myButton.setText("NEW Added Button");
-                //LinearLayout ll = (LinearLayout)findViewById(R.id.buttonlayout);
-                //LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-                //ll.addView(myButton, lp);
-
-
-
-                //break;
-
-            /*
-            Add the below code to whatever sort of button system you decide to implement. You may want each saved location to be its own button, but that's just my thought on it.
-            If each saved place is it's own button, you should then save and load the Place object of the location in the database, making this part much easier.
-            If you just save the name and the latitude and longitude, then you'll have to manually build the Place object.
-            In the FoodMapFragment, you will need to add something to the markers displayed for the food that allows a function call to save that place data in a database.
-            The code below sends the ArrayList of Place values mPlaces to the map, and the map uses that place data to build the markers to put on the map for the food locations.
-                fragmentTransaction = fragmentManager.beginTransaction();
-                FoodMapFragment mapFragment = new FoodMapFragment();
-                mapFragment.SetupMarkerLocation(mLocation);
-                mapFragment.GetFoodPlaces(mPlaces);
-                fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+            // Since I don't know the exact ID, I can't do cases for it. Send it to the default!
+            default:
+                // Get the number of the ID of the button clicked and add that one to the map
+                int id = v.getId();
+                if(id < numOfPlaces) {
+                    Place place = mPlaces.get(id);
+                    Log.d((String)place.getName(), "This is the place you picked");
+                    ArrayList<Place> savedLocPlace = new ArrayList<>();
+                    savedLocPlace.add(place);
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction;
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    FoodMapFragment mapFragment = new FoodMapFragment();
+                    mapFragment.SetupMarkerLocation(mLocation);
+                    mapFragment.GetFoodPlaces(savedLocPlace);
+                    fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
                 break;
-             */
         }
     }
-
-
 }

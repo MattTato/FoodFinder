@@ -5,10 +5,7 @@ import android.app.FragmentManager;
 import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,8 +27,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     Location mLocation;
     LocationRequest mLocationRequest;
     MainMenuFragment menuFragment;
-    //protected DbOperator _db = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +39,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         //create database
         DbOperator db = new DbOperator(this);
-        //_db=db;
-
-
-
-
-
 
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
@@ -65,15 +54,19 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     protected void onStart() {
         super.onStart();
         Log.d(message, "The onStart() event");
-        //reading all entries from database
+
+        /*
+        Commenting this out as we should read all the locations in the SavedLocationsFragment, not here
+        reading all entries from database
+
         Log.d("Reading: ", "Reading ALL Entries..");
         DbOperator db = new DbOperator(this);
-        List<com.osu.tatoczenko.foodfinder.Location> locations = db.getAllLoc();
+        List<SavedFoodLocation> locations = db.getAllLoc();
 
-        for (com.osu.tatoczenko.foodfinder.Location loc : locations){
+        for (SavedFoodLocation loc : locations){
             String log = "Id: " + loc.getId() + " ,RestID: " + loc.getRestId();
             Log.d("TYLER: ",log);
-        }
+        } */
     }
 
     @Override

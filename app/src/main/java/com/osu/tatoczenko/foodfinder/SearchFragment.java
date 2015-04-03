@@ -88,7 +88,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
 
         CreatePlaceFilters();
         mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
-        //mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, null);
         mAutocompleteView.setAdapter(mAdapter);
         mAdapter.setGoogleApiClient(mGoogleApiClient);
         mAdapter.setBounds(BOUNDS_FOOD_SEARCH);

@@ -4,6 +4,7 @@ package com.osu.tatoczenko.foodfinder;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.location.Location;
+import android.util.Log;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -13,6 +14,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -25,6 +34,8 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
     FoodTypeFragment foodTypeFragment;
     SearchFragment searchFragment;
     SavedLocationsFragment savedLocationsFragment;
+    ArrayList<Place> mPlaces = new ArrayList<>();
+    Place savedFoodPlace;
 
     public void UpdatedLocation(Location location){
         mLocation = location;
@@ -32,11 +43,16 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
 
     public void UpdateGoogleAPIClient(GoogleApiClient googleApiClient){
         mGoogleApiClient = googleApiClient;
+        GetSavedPlaces();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Used for refreshing the list of saved places
+        if(mGoogleApiClient != null){
+            GetSavedPlaces();
+        }
         View rootView = inflater.inflate(R.layout.main_menu, container, false);
         View btnFind = rootView.findViewById(R.id.findfood_button);
         btnFind.setOnClickListener(this);
@@ -48,6 +64,44 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
         btnExit.setOnClickListener(this);
         return rootView;
     }
+
+    private void GetSavedPlaces(){
+        mPlaces.clear();
+        DbOperator mDatabase = new DbOperator(getActivity());
+        List<SavedFoodLocation> savedFoodLocationList = mDatabase.getAllLoc();
+        for(SavedFoodLocation savedFoodLocation: savedFoodLocationList){
+            String placeId = savedFoodLocation.getRestId();
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                    .getPlaceById(mGoogleApiClient, placeId);
+            // Will be called after we get results from the Places API about the place with the ID we sent it
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+        }
+    }
+
+    /**
+     * Callback for results from a Places Geo Data API query that shows the first place result in
+     * the details view on screen.
+     */
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+            = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                // Request did not complete successfully
+                Log.e("BRUH", "Place query did not complete. Error: " + places.getStatus().toString());
+
+                return;
+            }
+            // Get the Place object from the buffer.
+            savedFoodPlace = places.get(0);
+            mPlaces.add(savedFoodPlace);
+            Log.i("BRUH", "Place details received: " + savedFoodPlace.getName());
+        }
+    };
 
     public void onClick(View v) {
         FragmentManager fragmentManager = getFragmentManager();
@@ -80,6 +134,8 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
                 savedLocationsFragment.UpdateGoogleAPIClient(mGoogleApiClient);
                 // Sends current user's location to be used in the map
                 savedLocationsFragment.UpdatedLocation(mLocation);
+                // Needed because the results callback didn't happen in time for it to be done right in the OnCreateView of SavedLocationsFragment
+                savedLocationsFragment.UpdatePlacesList(mPlaces);
                 fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
