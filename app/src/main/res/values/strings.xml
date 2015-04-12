@@ -8,6 +8,10 @@
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="food_type_fragment_name">FoodTypeFragment</string>
+    <string name="search_fragment_name">SearchFragment</string>
+    <string name="saved_locations_fragment_name">SavedLocationsFragment</string>
+
     <string name="places_browser_api_key">AIzaSyB6idw2Aj-V8s94RlaW92V-NyjHVFpjNAI</string>
 
 </resources>

@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -45,8 +46,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             menuFragment = new MainMenuFragment();
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.mainFrameDetails, menuFragment);
+            fragmentTransaction.add(R.id.mainFrameDetails, menuFragment, "MainMenuFragment");
             fragmentTransaction.commit();
+        } else {
+            FragmentManager fragmentManager = getFragmentManager();
+            menuFragment = (MainMenuFragment) fragmentManager.findFragmentByTag("MainMenuFragment");
         }
     }
 
@@ -54,19 +58,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     protected void onStart() {
         super.onStart();
         Log.d(message, "The onStart() event");
-
-        /*
-        Commenting this out as we should read all the locations in the SavedLocationsFragment, not here
-        reading all entries from database
-
-        Log.d("Reading: ", "Reading ALL Entries..");
-        DbOperator db = new DbOperator(this);
-        List<SavedFoodLocation> locations = db.getAllLoc();
-
-        for (SavedFoodLocation loc : locations){
-            String log = "Id: " + loc.getId() + " ,RestID: " + loc.getRestId();
-            Log.d("TYLER: ",log);
-        } */
     }
 
     @Override
@@ -74,6 +65,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         super.onResume();
         Log.d(message, "The onResume() event");
         if(!mGoogleApiClient.isConnected()){
+            Log.d(message, "Reconnecting to Google API");
             mGoogleApiClient.connect();
         }
     }
@@ -129,8 +121,13 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         startLocationUpdates();
         mLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
-        menuFragment.UpdatedLocation(mLocation);
-        menuFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+        if(menuFragment != null) {
+            Log.d(message, "Updating Menu location and API client");
+            menuFragment.UpdatedLocation(mLocation);
+            menuFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+        } else {
+            Log.d(message, "Couldn't update Menu Location and API client");
+        }
     }
 
     @Override
@@ -141,7 +138,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     @Override
     public void onLocationChanged(Location location){
         mLocation = location;
-        menuFragment.UpdatedLocation(mLocation);
+        if(menuFragment != null) {
+            menuFragment.UpdatedLocation(mLocation);
+        }
     }
 
     protected void startLocationUpdates(){

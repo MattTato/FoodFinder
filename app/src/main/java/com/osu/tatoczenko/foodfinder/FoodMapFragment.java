@@ -58,7 +58,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        if(hasNetworkConnection()) {
+            setUpMapIfNeeded();
+        }
     }
 
     @Override
@@ -112,17 +114,19 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 mapSettings.setAllGesturesEnabled(true);
                 mapSettings.setZoomControlsEnabled(true);
                 mapSettings.setMyLocationButtonEnabled(true);
-                setMarkerByLocation(currentLocation);
-                mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
-                mMarker.showInfoWindow();
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
-                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                    @Override
-                    public void onMapLoaded() {
-                        AddFoodPlacesToMap();
-                        ZoomCameraIn();
-                    }
-                });
+                if(currentLocation != null) {
+                    setMarkerByLocation(currentLocation);
+                    mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
+                    mMarker.showInfoWindow();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 14f));
+                    mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                        @Override
+                        public void onMapLoaded() {
+                            AddFoodPlacesToMap();
+                            ZoomCameraIn();
+                        }
+                    });
+                }
             }
         }
     }
@@ -193,14 +197,20 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    // if you want to check connectivity, use this method. you can disable the map if network is not available.
-    private boolean networkIsAvailable() {
-
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getActivity()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-
+    private	boolean hasNetworkConnection(){
+        ConnectivityManager connectivityManager	=
+                (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo	=
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        boolean isConnected	=	true;
+        boolean isWifiAvailable	=	networkInfo.isAvailable();
+        boolean isWifiConnected	=	networkInfo.isConnected();
+        networkInfo	=
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        boolean isMobileAvailable	=	networkInfo.isAvailable();
+        boolean isMobileConnnected	=	networkInfo.isConnected();
+        isConnected	=	(isMobileAvailable&&isMobileConnnected)	||
+                (isWifiAvailable&&isWifiConnected);
+        return(isConnected);
     }
 }

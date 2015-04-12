@@ -37,12 +37,49 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
     ArrayList<Place> mPlaces = new ArrayList<>();
     Place savedFoodPlace;
 
+    private static final String FOODTYPEFRAGMENTNAME = "FoodTypeFragment";
+    private static final String SEARCHFRAGMENTNAME = "SearchFragment";
+    private static final String SAVEDLOCATIONSFRAGMENTNAME = "SavedLocationsFragment";
+
     public void UpdatedLocation(Location location){
         mLocation = location;
+        FragmentManager fragmentManager = getFragmentManager();
+        foodTypeFragment = (FoodTypeFragment) fragmentManager.findFragmentByTag(FOODTYPEFRAGMENTNAME);
+        searchFragment = (SearchFragment) fragmentManager.findFragmentByTag(SEARCHFRAGMENTNAME);
+        savedLocationsFragment = (SavedLocationsFragment) fragmentManager.findFragmentByTag(SAVEDLOCATIONSFRAGMENTNAME);
+        if(foodTypeFragment != null){
+            foodTypeFragment.UpdatedLocation(mLocation);
+        } else {
+            Log.d("Locations:", "Couldn't update Food Type location");
+        }
+        if(searchFragment != null){
+            // Sends current user's location to be used in the map
+            searchFragment.UpdateLocation(mLocation);
+        } else {
+            Log.d("Locations:", "Couldn't update Search location");
+        }
+        if(savedLocationsFragment != null){
+            // Sends current user's location to be used in the map
+            savedLocationsFragment.UpdatedLocation(mLocation);
+        }else {
+            Log.d("Locations:", "Couldn't update Saved Locations location");
+        }
     }
 
     public void UpdateGoogleAPIClient(GoogleApiClient googleApiClient){
         mGoogleApiClient = googleApiClient;
+        if(foodTypeFragment != null){
+            // Sends Google API client to do Place Autocomplete and Map calls later
+            foodTypeFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+        }
+        if(searchFragment != null){
+            // Sends Google API client to do Place Autocomplete and Map calls later
+            searchFragment.UpdateGoogleApiClient(mGoogleApiClient);
+        }
+        if(savedLocationsFragment != null){
+            // Sends Google API client to do Place Autocomplete and Map calls later
+            savedLocationsFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+        }
         GetSavedPlaces();
     }
 
@@ -110,33 +147,47 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
             case R.id.findfood_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 foodTypeFragment = new FoodTypeFragment();
-                // Sends Google API client to do Place Autocomplete and Map calls later
-                foodTypeFragment.UpdateGoogleAPIClient(mGoogleApiClient);
-                // Sends current user's location to be used in the map
-                foodTypeFragment.UpdatedLocation(mLocation);
-                fragmentTransaction.replace(R.id.mainFrameDetails, foodTypeFragment);
+                if(mGoogleApiClient != null) {
+                    // Sends Google API client to do Place Autocomplete and Map calls later
+                    foodTypeFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+                }
+                if(mLocation != null) {
+                    // Sends current user's location to be used in the map
+                    foodTypeFragment.UpdatedLocation(mLocation);
+                }
+                fragmentTransaction.replace(R.id.mainFrameDetails, foodTypeFragment, FOODTYPEFRAGMENTNAME);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case R.id.search_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 searchFragment = new SearchFragment();
-                searchFragment.UpdateLocation(mLocation);
-                searchFragment.UpdateGoogleApiClient(mGoogleApiClient);
-                fragmentTransaction.replace(R.id.mainFrameDetails, searchFragment);
+                if(mGoogleApiClient != null) {
+                    // Sends Google API client to do Place Autocomplete and Map calls later
+                    searchFragment.UpdateGoogleApiClient(mGoogleApiClient);
+                }
+                if(mLocation != null) {
+                    // Sends current user's location to be used in the map
+                    searchFragment.UpdateLocation(mLocation);
+                }
+                fragmentTransaction.replace(R.id.mainFrameDetails, searchFragment, SEARCHFRAGMENTNAME);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case R.id.favorites_button:
                 fragmentTransaction = fragmentManager.beginTransaction();
                 savedLocationsFragment = new SavedLocationsFragment();
-                // Sends Google API client to do Place Autocomplete and Map calls later
-                savedLocationsFragment.UpdateGoogleAPIClient(mGoogleApiClient);
-                // Sends current user's location to be used in the map
-                savedLocationsFragment.UpdatedLocation(mLocation);
+                if(mGoogleApiClient != null) {
+                    // Sends Google API client to do Place Autocomplete and Map calls later
+                    savedLocationsFragment.UpdateGoogleAPIClient(mGoogleApiClient);
+                }
+                if(mLocation != null) {
+                    // Sends current user's location to be used in the map
+                    savedLocationsFragment.UpdatedLocation(mLocation);
+                }
                 // Needed because the results callback didn't happen in time for it to be done right in the OnCreateView of SavedLocationsFragment
                 savedLocationsFragment.UpdatePlacesList(mPlaces);
-                fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment);
+                fragmentTransaction.replace(R.id.mainFrameDetails, savedLocationsFragment, SAVEDLOCATIONSFRAGMENTNAME);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;

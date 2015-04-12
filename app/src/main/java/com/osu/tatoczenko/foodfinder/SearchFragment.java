@@ -58,7 +58,12 @@ public class SearchFragment extends Fragment implements OnClickListener{
 
     public void UpdateLocation(Location location){
         mLocation = location;
-        BOUNDS_FOOD_SEARCH = new LatLngBounds(new LatLng(mLocation.getLatitude() - 0.1, mLocation.getLongitude() - 0.1), new LatLng(mLocation.getLatitude() + 0.1, mLocation.getLongitude() + 0.1));
+        if(mLocation != null) {
+            BOUNDS_FOOD_SEARCH = new LatLngBounds(new LatLng(mLocation.getLatitude() - 0.1, mLocation.getLongitude() - 0.1), new LatLng(mLocation.getLatitude() + 0.1, mLocation.getLongitude() + 0.1));
+        } else {
+            // Will cover all of the 48 contiguous US states
+            BOUNDS_FOOD_SEARCH = new LatLngBounds(new LatLng(18.005611, -124.626080), new LatLng(48.987386, -62.361014));
+        }
     }
 
     public void UpdateGoogleApiClient(GoogleApiClient googleApiClient){
