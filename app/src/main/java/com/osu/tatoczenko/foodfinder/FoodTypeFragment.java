@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -172,15 +173,21 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 getFragmentManager().popBackStack();
                 break;
             case R.id.foodtype_map_button:
-                String queryURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                        + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=3000"
-                        + "&types=food&keyword=" + autoComplete.getText() + "&key="
-                        + browserAPIKey;
-                Log.d("FoodTypeFragment: ", "URL: " + queryURL);
-                try {
-                    new GetPlacesInfoFromWeb().execute(new URL(queryURL));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(mLocation != null) {
+                    String queryURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
+                            + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=3000"
+                            + "&types=food&keyword=" + autoComplete.getText() + "&key="
+                            + browserAPIKey;
+                    Log.d("FoodTypeFragment: ", "URL: " + queryURL);
+                    try {
+                        new GetPlacesInfoFromWeb().execute(new URL(queryURL));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    CharSequence textToDisplay = "Please turn on GPS, Wi-Fi, or Mobile Data to get your location";
+                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
+                    toast.show();
                 }
                 break;
         }

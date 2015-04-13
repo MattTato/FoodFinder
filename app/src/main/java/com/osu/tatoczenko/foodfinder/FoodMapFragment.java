@@ -152,6 +152,10 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                             ZoomCameraIn();
                         }
                     });
+                } else {
+                    CharSequence textToDisplay = "Please turn on GPS, Wi-Fi, or Mobile Data to get your location";
+                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
+                    toast.show();
                 }
             }
         }
@@ -200,27 +204,33 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.favorite_button:
-                for (int p = 0; p < mPlaces.size(); p++) {
-                    LatLng markerLatLng = lastMarkerClicked.getPosition();
-                    if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
-                        zPlace = mPlaces.get(p);
-                        Log.i(TAG4, zPlace.getId());
+                if(lastMarkerClicked != null) {
+                    for (int p = 0; p < mPlaces.size(); p++) {
+                        LatLng markerLatLng = lastMarkerClicked.getPosition();
+                        if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
+                            zPlace = mPlaces.get(p);
+                            Log.i(TAG4, zPlace.getId());
 
-                        //placeID of place they want to favorite
-                        zPlaceId = String.valueOf(zPlace.getId());
+                            //placeID of place they want to favorite
+                            zPlaceId = String.valueOf(zPlace.getId());
 
-                        DbOperator db = new DbOperator(v.getContext());
-                        if(db.addToDatabase(zPlaceId)){
-                            CharSequence textToDisplay = zPlace.getName() + " has been saved!";
-                            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                            toast.show();
-                        } else {
-                            CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
-                            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                            toast.show();
+                            DbOperator db = new DbOperator(v.getContext());
+                            if (db.addToDatabase(zPlaceId)) {
+                                CharSequence textToDisplay = zPlace.getName() + " has been saved!";
+                                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                                toast.show();
+                            } else {
+                                CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
+                                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                            break;
                         }
-                        break;
                     }
+                } else {
+                    CharSequence textToDisplay = "Please click a marker to save it as a favorite.";
+                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                    toast.show();
                 }
                 break;
         }
