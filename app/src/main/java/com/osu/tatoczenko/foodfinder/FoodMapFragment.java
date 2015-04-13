@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.app.FragmentManager;
 import android.util.Log;
@@ -55,11 +57,17 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private MapFragment mapFragment;
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
+    private static final String PARCELABLELIST = "MapMarkerList";
+
     @Override
     public void onResume() {
         super.onResume();
         if(hasNetworkConnection()) {
             setUpMapIfNeeded();
+        } else {
+            CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data";
+            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
@@ -69,6 +77,16 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         View btnFav = v.findViewById(R.id.favorite_button);
         btnFav.setOnClickListener(this);
         CloseKeyboard(v);
+
+        if(savedInstanceState != null){
+            ArrayList<MapPlacesParcelable> list = new ArrayList<MapPlacesParcelable>();
+            list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
+            for(MapPlacesParcelable mapPlace : list){
+                Log.d("Place stuff: ", mapPlace.toString());
+                mPlaces.add(mapPlace.place);
+            }
+        }
+
         return v;
     }
 
@@ -86,6 +104,18 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    // Needed in order to have the map markers stay on the map when you rotate the screen
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        ArrayList<MapPlacesParcelable> list = new ArrayList<MapPlacesParcelable>();
+        for (Place place : mPlaces) {
+            Log.d("Test: ", place.getId());
+            list.add(new MapPlacesParcelable(place));
+        }
+        outState.putParcelableArrayList(PARCELABLELIST, list);
+        super.onSaveInstanceState(outState);
     }
 
     public void SetupMarkerLocation(Location location) {
@@ -169,23 +199,23 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     LatLng markerLatLng = lastMarkerClicked.getPosition();
                     if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                         zPlace = mPlaces.get(p);
-
                         Log.i(TAG4, zPlace.getId());
+
+                        //placeID of place they want to favorite
+                        zPlaceId = String.valueOf(zPlace.getId());
+
+                        DbOperator db = new DbOperator(v.getContext());
+                        if(db.addToDatabase(zPlaceId)){
+                            CharSequence textToDisplay = zPlace.getName() + " has been saved!";
+                            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                            toast.show();
+                        } else {
+                            CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
+                            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
                         break;
                     }
-                }
-                //placeID of place they want to favorite
-                zPlaceId = String.valueOf(zPlace.getId());
-
-                DbOperator db = new DbOperator(v.getContext());
-                if(db.addToDatabase(zPlaceId)){
-                    CharSequence textToDisplay = zPlace.getName() + " has been saved!";
-                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                    toast.show();
-                } else {
-                    CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
-                    Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                    toast.show();
                 }
                 break;
         }

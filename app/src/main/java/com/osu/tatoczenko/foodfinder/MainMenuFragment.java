@@ -68,6 +68,10 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
 
     public void UpdateGoogleAPIClient(GoogleApiClient googleApiClient){
         mGoogleApiClient = googleApiClient;
+        FragmentManager fragmentManager = getFragmentManager();
+        foodTypeFragment = (FoodTypeFragment) fragmentManager.findFragmentByTag(FOODTYPEFRAGMENTNAME);
+        searchFragment = (SearchFragment) fragmentManager.findFragmentByTag(SEARCHFRAGMENTNAME);
+        savedLocationsFragment = (SavedLocationsFragment) fragmentManager.findFragmentByTag(SAVEDLOCATIONSFRAGMENTNAME);
         if(foodTypeFragment != null){
             // Sends Google API client to do Place Autocomplete and Map calls later
             foodTypeFragment.UpdateGoogleAPIClient(mGoogleApiClient);
