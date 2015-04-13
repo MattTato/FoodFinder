@@ -16,10 +16,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.List;
-
 
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
     String message = "Android_Log_Test : ";
@@ -39,7 +35,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         mGoogleApiClient.connect();
 
         //create database
-        DbOperator db = new DbOperator(this);
+        //DbOperator db = new DbOperator(this);
 
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
@@ -148,7 +144,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     protected void stopLocationUpdates(){
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if(mGoogleApiClient != null) {
+            if(mGoogleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            }
+        }
     }
 
     protected void createLocationRequest() {

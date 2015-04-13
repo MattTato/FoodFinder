@@ -2,7 +2,6 @@ package com.osu.tatoczenko.foodfinder;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.res.ColorStateList;
 import android.location.Location;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,10 +30,9 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
     GoogleApiClient mGoogleApiClient;
     Location mLocation;
     ArrayList<Place> mPlaces = new ArrayList<>();
-    Place savedFoodPlace;
     int numOfPlaces;
 
-    private static final String TAG = "PlaceAutoCompleteAdapt";
+    private static final String PARCELABLELIST = "PlaceList";
 
     public SavedLocationsFragment() {
         // Required empty public constructor
@@ -61,6 +59,14 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
 
         View btnBack = v.findViewById(R.id.savedlocback_button);
         btnBack.setOnClickListener(this);
+
+        if(savedInstanceState != null){
+            ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
+            for(MapPlacesParcelable mapPlace : list){
+                Log.d("Place stuff: ", mapPlace.toString());
+                mPlaces.add(mapPlace.place);
+            }
+        }
 
         // Get the inner LinearLayout of the SavedLocationsFragment layout to fill with buttons
         LinearLayout savedLocLL = (LinearLayout)v.findViewById(R.id.savedloc_LL);
@@ -90,6 +96,18 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             savedLocLL.addView(textView);
         }
         return v;
+    }
+
+    // Needed in order to have the map markers stay on the map when you rotate the screen
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        ArrayList<MapPlacesParcelable> list = new ArrayList<>();
+        for (Place place : mPlaces) {
+            Log.d("Test: ", place.getId());
+            list.add(new MapPlacesParcelable(place));
+        }
+        outState.putParcelableArrayList(PARCELABLELIST, list);
+        super.onSaveInstanceState(outState);
     }
 
     public void onClick(View v){

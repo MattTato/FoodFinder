@@ -7,8 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.app.FragmentManager;
 import android.util.Log;
@@ -55,20 +53,19 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private ArrayList<Place> mPlaces = new ArrayList<>();
 
     private MapFragment mapFragment;
-    private final String TAG = ((Object) this).getClass().getSimpleName();
 
     private static final String PARCELABLELIST = "MapMarkerList";
 
     @Override
     public void onResume() {
         super.onResume();
-        if(hasNetworkConnection()) {
+        //if(hasNetworkConnection()) {
             setUpMapIfNeeded();
-        } else {
+        /*} else {
             CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data";
             Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
             toast.show();
-        }
+        } */
     }
 
     @Override
@@ -79,8 +76,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         CloseKeyboard(v);
 
         if(savedInstanceState != null){
-            ArrayList<MapPlacesParcelable> list = new ArrayList<MapPlacesParcelable>();
-            list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
+            ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
             for(MapPlacesParcelable mapPlace : list){
                 Log.d("Place stuff: ", mapPlace.toString());
                 mPlaces.add(mapPlace.place);
@@ -109,7 +105,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     // Needed in order to have the map markers stay on the map when you rotate the screen
     @Override
     public void onSaveInstanceState(Bundle outState){
-        ArrayList<MapPlacesParcelable> list = new ArrayList<MapPlacesParcelable>();
+        ArrayList<MapPlacesParcelable> list = new ArrayList<>();
         for (Place place : mPlaces) {
             Log.d("Test: ", place.getId());
             list.add(new MapPlacesParcelable(place));
@@ -177,8 +173,18 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     private void AddFoodPlacesToMap() {
         if (mPlaces != null) {
-            for (Place place : mPlaces) {
-                mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
+            if(mPlaces.size() > 0) {
+                for (Place place : mPlaces) {
+                    mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
+                }
+            } else if(!hasNetworkConnection()){
+                CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data to find food places";
+                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                CharSequence textToDisplay = "Just showing current location";
+                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
     }
@@ -194,8 +200,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.favorite_button:
-                int p = 0;
-                for (p = 0; p < mPlaces.size(); p++) {
+                for (int p = 0; p < mPlaces.size(); p++) {
                     LatLng markerLatLng = lastMarkerClicked.getPosition();
                     if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                         zPlace = mPlaces.get(p);
@@ -232,7 +237,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo	=
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        boolean isConnected	=	true;
+        boolean isConnected	= true;
         boolean isWifiAvailable	=	networkInfo.isAvailable();
         boolean isWifiConnected	=	networkInfo.isConnected();
         networkInfo	=

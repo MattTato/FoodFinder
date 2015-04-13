@@ -3,17 +3,22 @@ package com.osu.tatoczenko.foodfinder;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -72,10 +77,22 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
         View v = inflater.inflate(R.layout.fragment_food_type, container, false);
         // Setup autocomplete field
         autoComplete = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_foodtype_search);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        // Needed for landscape view of the AutoCompleteTextView, which has a Done button
+        autoComplete.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                // Closes the keyboard in landscape view, returning the user to the regular fragment view
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                    android.R.layout.simple_list_item_1, FOOD_TYPES);
         autoComplete.setAdapter(adapter);
-
 
         // Set the onclicklisteners
         v.findViewById(R.id.foodtype_map_button).setOnClickListener(this);
@@ -109,8 +126,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     private void mapPlaces(ArrayList<String> places) {
         mPlaces.clear();
         // Get the places by id
-        int i = 0;
-        for (i = 0; i < places.size(); i++) {
+        for (int i = 0; i < places.size(); i++) {
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient,
                     places.get(i));
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);

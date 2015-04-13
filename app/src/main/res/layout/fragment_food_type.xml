@@ -22,6 +22,7 @@
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:id="@+id/autocomplete_foodtype_search"
             android:hint="What kind of food do you want?" />
 

@@ -1,7 +1,9 @@
 package com.osu.tatoczenko.foodfinder;
 
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -10,8 +12,11 @@ import android.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -20,7 +25,6 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -35,8 +39,6 @@ import java.util.List;
  * Most of the code was taken from the Places Autocomplete Sample Project, but adapted to work for our app.
  */
 public class SearchFragment extends Fragment implements OnClickListener{
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     Location mLocation;
 
     private GoogleApiClient mGoogleApiClient;
@@ -49,6 +51,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
     private PlaceAutocompleteAdapter mAdapter;
     private static final String TAG = "PlaceAutoCompleteAdapt";
     private static final String TAG2 = "TYLER";
+    private static final String PARCELABLELIST = "PlaceList";
 
     private LatLngBounds BOUNDS_FOOD_SEARCH;
 
@@ -71,7 +74,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
     }
 
     void CreatePlaceFilters(){
-        List<Integer> placeList = new ArrayList<Integer>();
+        List<Integer> placeList = new ArrayList<>();
         /*
             So Autocomplete only filters by certain things. So I can't filter by FOOD or RESTAURANT, but ESTABLISHMENT works.
             Here's the info: https://developers.google.com/places/supported_types
@@ -90,6 +93,17 @@ public class SearchFragment extends Fragment implements OnClickListener{
         View v = inflater.inflate(R.layout.fragment_search, container, false);
         mAutocompleteView = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_food_search);
         mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+        mAutocompleteView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         CreatePlaceFilters();
         mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
@@ -103,7 +117,28 @@ public class SearchFragment extends Fragment implements OnClickListener{
         btnMap.setOnClickListener(this);
         View btnBack = v.findViewById(R.id.searchback_button);
         btnBack.setOnClickListener(this);
+
+        if(savedInstanceState != null){
+            ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
+            for(MapPlacesParcelable mapPlace : list){
+                Log.d("Place stuff: ", mapPlace.toString());
+                mPlaces.add(mapPlace.place);
+            }
+        }
+
         return v;
+    }
+
+    // Needed in order to have the map markers stay on the map when you rotate the screen
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        ArrayList<MapPlacesParcelable> list = new ArrayList<>();
+        for (Place place : mPlaces) {
+            Log.d("Test: ", place.getId());
+            list.add(new MapPlacesParcelable(place));
+        }
+        outState.putParcelableArrayList(PARCELABLELIST, list);
+        super.onSaveInstanceState(outState);
     }
 
     /**
