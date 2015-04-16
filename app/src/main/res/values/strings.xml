@@ -13,5 +13,6 @@
     <string name="saved_locations_fragment_name">SavedLocationsFragment</string>
 
     <string name="places_browser_api_key">AIzaSyB6idw2Aj-V8s94RlaW92V-NyjHVFpjNAI</string>
+    <string name="title_activity_test_fragment">TestFragmentActivity</string>
 
 </resources>
