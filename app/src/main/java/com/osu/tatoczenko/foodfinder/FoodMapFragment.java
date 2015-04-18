@@ -41,7 +41,6 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private GoogleMap mMap;
     private static Marker mMarker;
 
-    private static String TAG4 = "zplaceIDis.....";
     public static int i=-1;
 
     Place zPlace;
@@ -59,8 +58,6 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     // The way the code currently is, either mPlaces will have stuff in it while the others are
     // empty, or mPlaces will be empty while the others have stuff in them
-
-    private MapFragment mapFragment;
 
     private static final String PARCELABLELIST = "MapMarkerList";
 
@@ -98,7 +95,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FragmentManager fm = getChildFragmentManager();
-        mapFragment = (MapFragment) fm.findFragmentById(R.id.mapFrame);
+        MapFragment mapFragment = (MapFragment) fm.findFragmentById(R.id.mapFrame);
         if (mapFragment == null) {
             mapFragment = MapFragment.newInstance();
             fm.beginTransaction().replace(R.id.mapFrame, mapFragment).commit();
@@ -203,7 +200,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 }
             } else if (mPlaceIDs.size() > 0 && mPlaceIDs.size() == mNames.size() && mPlaceIDs.size() == mLatLngs.size()) {
                 // Checking if all the arrays are the same size is probably unnecessary but whatever
-                 int i = 0;
+                 int i;
                  for (i = 0; i < mPlaceIDs.size(); i++) {
                      mMap.addMarker(new MarkerOptions().position(mLatLngs.get(i)).title(mNames.get(i)));
                  }
@@ -249,6 +246,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     for (int p = 0; p < mPlaces.size(); p++) {
                         if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                             zPlace = mPlaces.get(p);
+                            String TAG4 = "zplaceIDis.....";
                             Log.i(TAG4, zPlace.getId());
 
                             //placeID of place they want to favorite
@@ -297,7 +295,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo	=
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        boolean isConnected	= true;
+        boolean isConnected;
         boolean isWifiAvailable	=	networkInfo.isAvailable();
         boolean isWifiConnected	=	networkInfo.isConnected();
         networkInfo	=

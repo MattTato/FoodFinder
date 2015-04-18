@@ -1,18 +1,18 @@
 package com.osu.tatoczenko.foodfinder;
 
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View.OnClickListener;
-import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -22,11 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
@@ -124,7 +119,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
         mNames.clear();
         mLatLngs.clear();
 
-        int index = 0;
+        int index;
         if (json.contains(idString)) { // If this returns true, then at least one more place remains
             // In the JSON, the order of information goes: lat, lng, name, place_id
             index = json.indexOf(latString); // first occurrence of "lat"
@@ -229,7 +224,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 HttpResponse execute = client.execute(httpGet);
                 InputStream content = execute.getEntity().getContent();
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s = "";
+                String s;
                 // Reading in the HTTP response to a string
                 while ((s = buffer.readLine()) != null) {
                     response += s;
