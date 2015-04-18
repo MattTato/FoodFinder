@@ -100,7 +100,7 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             textView.setText("You don't seem to have any saved locations");
             textView.setGravity(Gravity.CENTER_HORIZONTAL);
             savedLocLL.addView(textView);
-        } else {
+        } else if (numOfPlaces == 0 && !hasNetworkConnection()) {
             TextView textView = new TextView(getActivity());
             textView.setTextColor(getResources().getColor(android.R.color.black));
             textView.setTextSize(20f);

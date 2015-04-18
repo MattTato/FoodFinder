@@ -80,7 +80,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
           */
         placeList.add(Place.TYPE_ESTABLISHMENT);
         mFilter = AutocompleteFilter.create(placeList);
-        Log.d("Set has these places: ", mFilter.toString());
     }
 
     @Override
@@ -123,7 +122,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
         if(savedInstanceState != null){
             ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
             for(MapPlacesParcelable mapPlace : list){
-                Log.d("Place stuff: ", mapPlace.toString());
                 mPlaces.add(mapPlace.place);
             }
         }
@@ -197,7 +195,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
             // Add this Place object into the ArrayList for easy passing into the FoodMapFragment
             mPlaces.clear();
             mPlaces.add(searchedFoodPlace);
-            Log.i(TAG, "Place details received" + searchedFoodPlace.getName());
+            Log.i(TAG, "Place details received " + searchedFoodPlace.getName());
         }
     };
 
@@ -209,7 +207,13 @@ public class SearchFragment extends Fragment implements OnClickListener{
                 mAutocompleteView.setText("");
                 break;
             case R.id.map_button:
-                // Starts the FoodMapFragment and sends the most recent searched for place to the map to be viewed
+                /* Starts the FoodMapFragment and sends the most recent searched for place to the map to be viewed
+                   If the search was cleared, don't send any food place
+                 */
+                Log.d("Searched Text", mAutocompleteView.getText().toString());
+                if(mAutocompleteView.getText().toString().equals("")){
+                    mPlaces.clear();
+                }
                 fragmentTransaction = fragmentManager.beginTransaction();
                 FoodMapFragment mapFragment = new FoodMapFragment();
                 mapFragment.SetupMarkerLocation(mLocation);
