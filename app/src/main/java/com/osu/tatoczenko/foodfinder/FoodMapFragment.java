@@ -177,6 +177,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
             LatLngBounds.Builder cameraBoundsBuilder = new LatLngBounds.Builder();
             cameraBoundsBuilder.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
             // Only one of the following for loops will actually do anything
+            // Include each LatLng that the mPlaces and mLatLngs arrays contain so that
+            // the locations that were searched for will be visible on screen without
+            // the need to zoom out or pan
             for (Place place : mPlaces) {
                 cameraBoundsBuilder.include(place.getLatLng());
                 Log.d((String)place.getName(), place.getLatLng().toString());
@@ -199,6 +202,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
                 }
             } else if (mPlaceIDs.size() > 0 && mPlaceIDs.size() == mNames.size() && mPlaceIDs.size() == mLatLngs.size()) {
+                // Checking if all the arrays are the same size is probably unnecessary but whatever
                  int i = 0;
                  for (i = 0; i < mPlaceIDs.size(); i++) {
                      mMap.addMarker(new MarkerOptions().position(mLatLngs.get(i)).title(mNames.get(i)));
@@ -225,9 +229,11 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     @Override
     public boolean onMarkerClick(Marker m) {
-    //lastClickedMarker
+        // Store the last marker clicked so it can be saved as a favorite later
+        // should the user want
         lastMarkerClicked = m;
         return false;
+        // return of false means nothing, just included because it needs it
     }
 
 
@@ -237,6 +243,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 if(lastMarkerClicked != null) {
                     LatLng markerLatLng = lastMarkerClicked.getPosition();
                     // Only one of the following for loops will actually do anything
+                    // Depending on which arrays have info in them, the objects in said array
+                    // will be checked against the LatLng of the last clicked marker to find
+                    // a match, and then the matching PlaceID will be saved in the database
                     for (int p = 0; p < mPlaces.size(); p++) {
                         if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                             zPlace = mPlaces.get(p);
@@ -276,6 +285,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
             toast.show();
         }
     }
+
     private void setMarkerByLocation(Location location){
         if(mMarker != null){
             mMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));

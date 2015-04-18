@@ -51,7 +51,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     Location mLocation;
     final String browserAPIKey = "AIzaSyB6idw2Aj-V8s94RlaW92V-NyjHVFpjNAI";
 
-    //ArrayList<Place> mPlaces = new ArrayList<>();
 
     // Lists of the LatLng, Name, and PlaceID (for optimization purposes
     ArrayList<LatLng> mLatLngs = new ArrayList<>();
@@ -63,7 +62,8 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     // Adding to the list of suggestions is simple but would be tedious if it was to be made
     // all inclusive
     private static final String[] FOOD_TYPES = new String[] { "American", "Italian", "Mexican",
-        "Chicken", "Hamburgers", "Greek", "Indian", "Pizza"};
+        "Chicken", "Hamburgers", "Greek", "Indian", "Pizza", "Breakfast", "Burgers", "Burritos",
+        "Ice Cream", "Smoothies", "Milkshakes", "Hotdogs"};
 
     public FoodTypeFragment() {
         // Required empty public constructor
@@ -97,6 +97,8 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 return false;
             }
         });
+
+        // Make an adapter for the autocomplete field based on the FOOD_TYPES string array above
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                    android.R.layout.simple_list_item_1, FOOD_TYPES);
         autoComplete.setAdapter(adapter);
@@ -121,7 +123,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
         mPlaceIDs.clear();
         mNames.clear();
         mLatLngs.clear();
-        //mPlaces.clear();
 
         int index = 0;
         if (json.contains(idString)) { // If this returns true, then at least one more place remains
@@ -132,9 +133,10 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 int start = index + latString.length() + 4;
                 int end = json.indexOf(",", start);
                 // Lat and Lng both of format (-)##.###### (decimal not always this long)
-                // Lat ended with a comma, Lng ended with a newline
+                // Lat ended with a comma, Lng ended with a }
                 String lat = json.substring(start, end);
                 Log.d("FoodTypeFragment: ", "Lat: " + lat);
+
                 // Grab longitude
                 index = json.indexOf(lngString, end);
                 start = index + lngString.length() + 4;
@@ -143,19 +145,24 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 Log.d("FoodTypeFragment: ", "Lng: " + lng);
                 LatLng ll = new LatLng(Double.parseDouble(lat),Double.parseDouble(lng));
                 Log.d("FoodTypeFragment: ", "LatLng: " + ll.toString());
-                // Grab name
+
+                // Grab name, which is of format "name" : "name here"
                 index = json.indexOf(nameString, end);
                 start = index + nameString.length() + 5;
                 end = json.indexOf("\"", start);
                 String name = json.substring(start, end);
                 Log.d("FoodTypeFragment: ", "Name: " + name);
+
                 // from the index of the beginning of "places_id", the id starts five characters
                 // after the end of "places_id" and is 27 characters long
+                // "place_id" : "placeID here"
                 index = json.indexOf(idString, end);
                 start = index + idString.length() + 5;
                 end = start + 27;
                 String placeID = json.substring(start, end);
                 Log.d("FoodTypeFragment: ", "Place_ID: " + placeID);
+
+                // Get next occurrence of lat
                 index = json.indexOf(latString, end);
                 // Add all information to appropriate lists
                 mPlaceIDs.add(placeID);
@@ -192,6 +199,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                     // Use the Google Places Browser API to make a more general call
                     // than the other parts of the app, specifically using whatever is currently
                     // in the text field
+                    // This call will search from the user's current location in a 3000 meter radius
                     String queryURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
                             + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=3000"
                             + "&types=food&keyword=" + autoComplete.getText() + "&key="
@@ -222,6 +230,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 InputStream content = execute.getEntity().getContent();
                 BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
                 String s = "";
+                // Reading in the HTTP response to a string
                 while ((s = buffer.readLine()) != null) {
                     response += s;
                 }
