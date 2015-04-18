@@ -59,8 +59,12 @@ public class DbOperator extends SQLiteOpenHelper {
         List<SavedFoodLocation> savedLocList = getAllLoc();
         boolean canAddToDatabase = true;
         for(SavedFoodLocation savedLoc : savedLocList){
-            if(savedLoc.getRestId().equals(restaurantId)){
-                canAddToDatabase = false;
+            // somehow my SavedLocations got a null pointer in them and I don't know how to
+            // delete my database so I guess I'll just add this in - Marshall
+            if (savedLoc.getRestId() != null) {
+                if (savedLoc.getRestId().equals(restaurantId)) {
+                    canAddToDatabase = false;
+                }
             }
         }
         if(canAddToDatabase) {

@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -50,7 +51,12 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     Location mLocation;
     final String browserAPIKey = "AIzaSyB6idw2Aj-V8s94RlaW92V-NyjHVFpjNAI";
 
-    ArrayList<Place> mPlaces = new ArrayList<>();
+    //ArrayList<Place> mPlaces = new ArrayList<>();
+
+    // Lists of the LatLng, Name, and PlaceID (for optimization purposes
+    ArrayList<LatLng> mLatLngs = new ArrayList<>();
+    ArrayList<String> mNames = new ArrayList<>();
+    ArrayList<String> mPlaceIDs = new ArrayList<>();
 
     private AutoCompleteTextView autoComplete;
 
@@ -105,33 +111,68 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
 
 
     private void parseJSONForPlaceIDs(String json) {
+        // Keywords that indicate info in the json
+        final String latString = "lat";
+        final String lngString = "lng";
+        final String nameString = "name";
         final String idString = "place_id";
-        ArrayList ids = new ArrayList<String>();
+
+        // Clear the ArrayLists
+        mPlaceIDs.clear();
+        mNames.clear();
+        mLatLngs.clear();
+        //mPlaces.clear();
+
         int index = 0;
-        if (json.contains(idString)) {
-            index = json.indexOf(idString, index + idString.length());
+        if (json.contains(idString)) { // If this returns true, then at least one more place remains
+            // In the JSON, the order of information goes: lat, lng, name, place_id
+            index = json.indexOf(latString); // first occurrence of "lat"
             while (index != -1) {
+                // Grab latitude
+                int start = index + latString.length() + 4;
+                int end = json.indexOf(",", start);
+                // Lat and Lng both of format (-)##.###### (decimal not always this long)
+                // Lat ended with a comma, Lng ended with a newline
+                String lat = json.substring(start, end);
+                Log.d("FoodTypeFragment: ", "Lat: " + lat);
+                // Grab longitude
+                index = json.indexOf(lngString, end);
+                start = index + lngString.length() + 4;
+                end = json.indexOf("}", start);
+                String lng = json.substring(start, end);
+                Log.d("FoodTypeFragment: ", "Lng: " + lng);
+                LatLng ll = new LatLng(Double.parseDouble(lat),Double.parseDouble(lng));
+                Log.d("FoodTypeFragment: ", "LatLng: " + ll.toString());
+                // Grab name
+                index = json.indexOf(nameString, end);
+                start = index + nameString.length() + 5;
+                end = json.indexOf("\"", start);
+                String name = json.substring(start, end);
+                Log.d("FoodTypeFragment: ", "Name: " + name);
                 // from the index of the beginning of "places_id", the id starts five characters
                 // after the end of "places_id" and is 27 characters long
-                int start = index + idString.length() + 5;
-                int end = start + 27;
+                index = json.indexOf(idString, end);
+                start = index + idString.length() + 5;
+                end = start + 27;
                 String placeID = json.substring(start, end);
                 Log.d("FoodTypeFragment: ", "Place_ID: " + placeID);
-                index = json.indexOf(idString, index + idString.length());
-                ids.add(placeID);
+                index = json.indexOf(latString, end);
+                // Add all information to appropriate lists
+                mPlaceIDs.add(placeID);
+                mLatLngs.add(ll);
+                mNames.add(name);
             }
         }
-        mapPlaces(ids);
+        mapPlaces();
     }
 
-    private void mapPlaces(ArrayList<String> places) {
-        mPlaces.clear();
+    private void mapPlaces() {
         // Get the places by id
-        for (int i = 0; i < places.size(); i++) {
+        /*for (int i = 0; i < places.size(); i++) {
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient,
                     places.get(i));
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
-        }
+        }*/
 
         // Map the places
         FragmentManager fragmentManager = getFragmentManager();
@@ -139,7 +180,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
         fragmentTransaction = fragmentManager.beginTransaction();
         FoodMapFragment mapFragment = new FoodMapFragment();
         mapFragment.SetupMarkerLocation(mLocation);
-        mapFragment.GetFoodPlaces(mPlaces);
+        mapFragment.GetFoodPlaces(mLatLngs, mNames, mPlaceIDs);
         fragmentTransaction.replace(R.id.mainFrameDetails, mapFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -158,7 +199,7 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
             }
             // Get the Place object from the buffer.
             Place searchedFoodPlace = places.get(0);
-            mPlaces.add(searchedFoodPlace);
+            //mPlaces.add(searchedFoodPlace);
 
             Log.i("FoodTypeFragment: ", "Place details received: " + searchedFoodPlace.getName());
         }

@@ -52,6 +52,11 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private static Location currentLocation;
     private ArrayList<Place> mPlaces = new ArrayList<>();
 
+    // Alternate information for the places
+    private ArrayList<LatLng> mLatLngs = new ArrayList<>();
+    private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mPlaceIDs = new ArrayList<>();
+
     private MapFragment mapFragment;
 
     private static final String PARCELABLELIST = "MapMarkerList";
@@ -122,6 +127,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         mPlaces = places;
     }
 
+    public void GetFoodPlaces(ArrayList<LatLng> latlngs, ArrayList<String> names, ArrayList<String>
+                              placeIDs) { mLatLngs = latlngs; mNames = names; mPlaceIDs = placeIDs; }
+
     private void CloseKeyboard(View v) {
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -165,9 +173,13 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         if (mPlaces != null) {
             LatLngBounds.Builder cameraBoundsBuilder = new LatLngBounds.Builder();
             cameraBoundsBuilder.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            // Only one of the following for loops will actually do anything
             for (Place place : mPlaces) {
                 cameraBoundsBuilder.include(place.getLatLng());
                 Log.d((String)place.getName(), place.getLatLng().toString());
+            }
+            for (int i = 0; i < mLatLngs.size(); i++) {
+                cameraBoundsBuilder.include(mLatLngs.get(i));
             }
             LatLngBounds cameraBounds = cameraBoundsBuilder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(cameraBounds, 0));
@@ -176,21 +188,36 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     }
 
     private void AddFoodPlacesToMap() {
+        // If SearchFragment or SavedLocations was used, mPlaces will have info
+        // If FoodTypeFragment was used, then the other three lists will have the info
         if (mPlaces != null) {
             if(mPlaces.size() > 0) {
                 for (Place place : mPlaces) {
                     mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()));
                 }
+            } else if (mPlaceIDs.size() > 0 && mPlaceIDs.size() == mNames.size() && mPlaceIDs.size() == mLatLngs.size()) {
+                 int i = 0;
+                 for (i = 0; i < mPlaceIDs.size(); i++) {
+                     mMap.addMarker(new MarkerOptions().position(mLatLngs.get(i)).title(mNames.get(i)));
+                 }
             } else if(!hasNetworkConnection()){
-                CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data to find food places";
-                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
-                toast.show();
+                AskUserToTurnOnNetwork();
             } else {
-                CharSequence textToDisplay = "Just showing current location";
-                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                toast.show();
+                NotifyUserThatOnlyCurrentLocationIsDisplayed();
             }
         }
+    }
+
+    private void AskUserToTurnOnNetwork() {
+        CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data to find food places";
+        Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+    private void NotifyUserThatOnlyCurrentLocationIsDisplayed(){
+        CharSequence textToDisplay = "Just showing current location";
+        Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
@@ -205,8 +232,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         switch (v.getId()) {
             case R.id.favorite_button:
                 if(lastMarkerClicked != null) {
+                    LatLng markerLatLng = lastMarkerClicked.getPosition();
+                    // Only one of the following for loops will actually do anything
                     for (int p = 0; p < mPlaces.size(); p++) {
-                        LatLng markerLatLng = lastMarkerClicked.getPosition();
                         if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                             zPlace = mPlaces.get(p);
                             Log.i(TAG4, zPlace.getId());
@@ -214,16 +242,13 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                             //placeID of place they want to favorite
                             zPlaceId = String.valueOf(zPlace.getId());
 
-                            DbOperator db = new DbOperator(v.getContext());
-                            if (db.addToDatabase(zPlaceId)) {
-                                CharSequence textToDisplay = zPlace.getName() + " has been saved!";
-                                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                                toast.show();
-                            } else {
-                                CharSequence textToDisplay = zPlace.getName() + " is already a favorite";
-                                Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
+                            addToDatabase(zPlaceId, zPlace.getName(), v);
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < mPlaceIDs.size(); i++) {
+                        if (mLatLngs.get(i).equals(markerLatLng)) {
+                            addToDatabase(mPlaceIDs.get(i), mNames.get(i), v);
                             break;
                         }
                     }
@@ -236,6 +261,18 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
+    private void addToDatabase(String placeID, CharSequence name, View v) {
+        DbOperator db = new DbOperator(v.getContext());
+        if (db.addToDatabase(placeID)) {
+            CharSequence textToDisplay = name + " has been saved!";
+            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            CharSequence textToDisplay = name + " is already a favorite";
+            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
     private void setMarkerByLocation(Location location){
         if(mMarker != null){
             mMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
