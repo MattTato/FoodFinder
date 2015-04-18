@@ -34,9 +34,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         createLocationRequest();
         mGoogleApiClient.connect();
 
-        //create database
-        //DbOperator db = new DbOperator(this);
-
         Log.d(message, "The onCreate() event");
         if (savedInstanceState == null) {
             menuFragment = new MainMenuFragment();
@@ -87,31 +84,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         Log.d(message, "The onDestroy() event");
     }
 
-    /*
-        We won't be doing anything with an options menu, so I commented this part out.
-        If we decide to add items to the options menu, we can put this back in later
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    } */
-
     @Override
     public void onConnected(Bundle connectionHint){
         startLocationUpdates();
@@ -128,7 +100,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     @Override
     public void onConnectionSuspended(int i){
-        // Do things
+        // Not used, but required for using the GoogleApiClient
     }
 
     @Override
@@ -169,8 +141,4 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     public void onConnectionFailed(ConnectionResult connectionResult) {
         mGoogleApiClient.disconnect();
     }
-
-
-
-
 }

@@ -2,7 +2,10 @@ package com.osu.tatoczenko.foodfinder;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View.OnClickListener;
@@ -85,7 +88,10 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             numOfPlaces++;
             savedLocLL.addView(savedLocButton);
         }
-        if(numOfPlaces == 0){
+        /* If there were no places, make sure there's a network connection.
+           If there isn't, then we weren't able to get the place details because there's no network
+         */
+        if(numOfPlaces == 0 && hasNetworkConnection()){
             TextView textView = new TextView(getActivity());
             textView.setTextColor(getResources().getColor(android.R.color.black));
             textView.setTextSize(20f);
@@ -94,11 +100,20 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
             textView.setText("You don't seem to have any saved locations");
             textView.setGravity(Gravity.CENTER_HORIZONTAL);
             savedLocLL.addView(textView);
+        } else {
+            TextView textView = new TextView(getActivity());
+            textView.setTextColor(getResources().getColor(android.R.color.black));
+            textView.setTextSize(20f);
+            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            textView.setLayoutParams(textParams);
+            textView.setText("Turn on WiFi or Mobile Data in order to get information on your saved places");
+            textView.setGravity(Gravity.CENTER_HORIZONTAL);
+            savedLocLL.addView(textView);
         }
         return v;
     }
 
-    // Needed in order to have the map markers stay on the map when you rotate the screen
+    // Needed in order to have the listing of saved places remain on the screen when the screen is rotated
     @Override
     public void onSaveInstanceState(Bundle outState){
         ArrayList<MapPlacesParcelable> list = new ArrayList<>();
@@ -136,5 +151,23 @@ public class SavedLocationsFragment extends Fragment implements OnClickListener 
                 }
                 break;
         }
+    }
+
+    // Checks to see if the phone has a valid network connection, either through WiFi or Mobile Data
+    private	boolean hasNetworkConnection(){
+        ConnectivityManager connectivityManager	=
+                (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo	=
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        boolean isConnected;
+        boolean isWifiAvailable	=	networkInfo.isAvailable();
+        boolean isWifiConnected	=	networkInfo.isConnected();
+        networkInfo	=
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        boolean isMobileAvailable	=	networkInfo.isAvailable();
+        boolean isMobileConnnected	=	networkInfo.isConnected();
+        isConnected	=	(isMobileAvailable&&isMobileConnnected)	||
+                (isWifiAvailable&&isWifiConnected);
+        return(isConnected);
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Created by tyler_cunnington on 3/30/15.
+ * Database for saving information on found food places
  */
 public class DbOperator extends SQLiteOpenHelper {
 
@@ -23,10 +24,6 @@ public class DbOperator extends SQLiteOpenHelper {
     //table columns
     private static final String KEY_ID = "id";
     private static final String KEY_REST_ID = "restID";
-
-
-
-
 
     private static final String[] COLUMNS = {KEY_ID,KEY_REST_ID};
 
@@ -46,12 +43,7 @@ public class DbOperator extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
-
-
-        //not sure if I need these lines
-
         onCreate(db);
-
     }
 
     //add stuff to database
@@ -77,10 +69,8 @@ public class DbOperator extends SQLiteOpenHelper {
         return canAddToDatabase;
     }
 
-
     //read a single row in database
     public SavedFoodLocation getFromTable(int id){
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(DATABASE_TABLE, new String[] {KEY_ID,KEY_REST_ID},KEY_ID + "=?", new String[]{String.valueOf(id)},null,null,null,null);
         if (cursor !=null)
@@ -92,9 +82,8 @@ public class DbOperator extends SQLiteOpenHelper {
     }
 
     // will return all rows from database in an array list
-
     public List<SavedFoodLocation> getAllLoc(){
-        List<SavedFoodLocation> locList = new ArrayList<SavedFoodLocation>();
+        List<SavedFoodLocation> locList = new ArrayList<>();
         //select all query
         String selectQuery = "SELECT * FROM " + DATABASE_TABLE;
 
@@ -108,8 +97,6 @@ public class DbOperator extends SQLiteOpenHelper {
                 location.setRestId(cursor.getString(1));
                 locList.add(location);
             } while (cursor.moveToNext());
-
-
         }
         //return list
         return locList;

@@ -7,39 +7,40 @@ import com.google.android.gms.location.places.Place;
 
 /**
  * Created by Matt Tatoczenko on 4/12/2015.
+ * Parcelable class in order to save alternate place info during screen rotations
  */
 public class MapPlacesParcelable implements Parcelable {
-        Place place;
+    Place place;
 
-        public MapPlacesParcelable(Place place) {
-            this.place = place;
-        }
-
-        private MapPlacesParcelable(Parcel in) {
-
-        }
-
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public String toString() {
-            return this.place.toString();
-        }
-
-        public void writeToParcel(Parcel out, int flags) {
-
-        }
-
-        public final Parcelable.Creator<MapPlacesParcelable> CREATOR = new Parcelable.Creator<MapPlacesParcelable>() {
-            public MapPlacesParcelable createFromParcel(Parcel in) {
-                return new MapPlacesParcelable(in);
-            }
-
-            public MapPlacesParcelable[] newArray(int size) {
-                return new MapPlacesParcelable[size];
-            }
-        };
+    public MapPlacesParcelable(Place place) {
+        this.place = place;
     }
+
+    private MapPlacesParcelable(Parcel in) {
+
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return this.place.toString();
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+
+    }
+
+    public final Parcelable.Creator<MapPlacesParcelable> CREATOR = new Parcelable.Creator<MapPlacesParcelable>() {
+        public MapPlacesParcelable createFromParcel(Parcel in) {
+            return new MapPlacesParcelable(in);
+        }
+
+        public MapPlacesParcelable[] newArray(int size) {
+            return new MapPlacesParcelable[size];
+        }
+    };
+}
 

@@ -2,6 +2,7 @@ package com.osu.tatoczenko.foodfinder;
 
 /**
  * Created by tyler_cunnington on 4/2/15.
+ * Used as the container for information stored in the database
  */
 public class SavedFoodLocation {
 

@@ -101,8 +101,6 @@ public class PlaceAutocompleteAdapter
         } else {
             mGoogleApiClient = googleApiClient;
         }
-
-
     }
 
     /**

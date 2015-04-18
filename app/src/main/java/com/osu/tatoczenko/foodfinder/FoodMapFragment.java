@@ -1,6 +1,5 @@
 package com.osu.tatoczenko.foodfinder;
 
-
 import android.content.Context;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-
 /**
  * A simple {@link Fragment} subclass.
  *
@@ -41,14 +39,14 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private GoogleMap mMap;
     private static Marker mMarker;
 
-    public static int i=-1;
-
     Place zPlace;
     String zPlaceId=null;
 
     private Marker lastMarkerClicked;
 
     private static Location currentLocation;
+
+    // Regular list for Place objects used to populate map markers
     private ArrayList<Place> mPlaces = new ArrayList<>();
 
     // Alternate information for the places
@@ -59,18 +57,13 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     // The way the code currently is, either mPlaces will have stuff in it while the others are
     // empty, or mPlaces will be empty while the others have stuff in them
 
-    private static final String PARCELABLELIST = "MapMarkerList";
+    private static final String PARCELABLEPLACELIST = "PlaceObjectList";
+    private static final String ALTERNATEPARCELABLEPLACELIST = "AlternatePlaceInfoList";
 
     @Override
     public void onResume() {
         super.onResume();
-        //if(hasNetworkConnection()) {
-            setUpMapIfNeeded();
-        /*} else {
-            CharSequence textToDisplay = "Please turn on Wi-Fi or Mobile Data";
-            Toast toast = Toast.makeText(getActivity(), textToDisplay, Toast.LENGTH_LONG);
-            toast.show();
-        } */
+        setUpMapIfNeeded();
     }
 
     @Override
@@ -81,10 +74,21 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         CloseKeyboard(v);
 
         if(savedInstanceState != null){
-            ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
+            /* Only one of the following ArrayLists will contain data, depending on if the FoodTypeFragment was used or if the other two were used
+               Either way, get the old lists of places and put them into the lists in order to recreate the markers
+               Have to recreate the lists due to the way the favorites are saved, as the clicked markers are compared to these lists
+             */
+            ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLEPLACELIST);
             for(MapPlacesParcelable mapPlace : list){
                 Log.d("Place stuff: ", mapPlace.toString());
                 mPlaces.add(mapPlace.place);
+            }
+
+            ArrayList<MapAlternatePlacesParcelable> altList = savedInstanceState.getParcelableArrayList(ALTERNATEPARCELABLEPLACELIST);
+            for(MapAlternatePlacesParcelable mapPlace : altList){
+                mLatLngs.add(mapPlace.latLng);
+                mNames.add(mapPlace.name);
+                mPlaceIDs.add(mapPlace.placeID);
             }
         }
 
@@ -110,12 +114,21 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     // Needed in order to have the map markers stay on the map when you rotate the screen
     @Override
     public void onSaveInstanceState(Bundle outState){
+        // If mPlaces has objects, save those into a parcelable array list to be reloaded in onCreateView
         ArrayList<MapPlacesParcelable> list = new ArrayList<>();
         for (Place place : mPlaces) {
             Log.d("Test: ", place.getId());
             list.add(new MapPlacesParcelable(place));
         }
-        outState.putParcelableArrayList(PARCELABLELIST, list);
+        outState.putParcelableArrayList(PARCELABLEPLACELIST, list);
+
+        // If the alternate array lists have objects, save them into a parcelable array list to be reloaded in onCreateView
+        ArrayList<MapAlternatePlacesParcelable> altList = new ArrayList<>();
+        for(int i = 0; i < mLatLngs.size(); i++){
+            altList.add(new MapAlternatePlacesParcelable(mLatLngs.get(i), mNames.get(i), mPlaceIDs.get(i)));
+        }
+        outState.putParcelableArrayList(ALTERNATEPARCELABLEPLACELIST, altList);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -123,6 +136,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         currentLocation = location;
     }
 
+    // Both GetFoodPlaces take in data from the other fragments in order to have information on food places
     public void GetFoodPlaces(ArrayList<Place> places) {
         mPlaces = places;
     }
@@ -248,12 +262,8 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                     for (int p = 0; p < mPlaces.size(); p++) {
                         if (mPlaces.get(p).getLatLng().equals(markerLatLng)) {
                             zPlace = mPlaces.get(p);
-                            String TAG4 = "zplaceIDis.....";
-                            Log.i(TAG4, zPlace.getId());
-
                             //placeID of place they want to favorite
                             zPlaceId = String.valueOf(zPlace.getId());
-
                             addToDatabase(zPlaceId, zPlace.getName(), v);
                             break;
                         }
@@ -292,7 +302,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    // TODO: maybe some comments here just to explain? I dunno
+    // Checks to see if the phone has a valid network connection, either through WiFi or Mobile Data
     private	boolean hasNetworkConnection(){
         ConnectivityManager connectivityManager	=
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

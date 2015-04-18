@@ -23,7 +23,8 @@ import java.util.List;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * Fragment for the Main Menu. This is the first fragment that pops up when the app is opened
+ * Each of the other fragments gets started from this one.
  */
 public class MainMenuFragment extends Fragment implements OnClickListener{
 
@@ -131,14 +132,13 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
         public void onResult(PlaceBuffer places) {
             if (!places.getStatus().isSuccess()) {
                 // Request did not complete successfully
-                Log.e("BRUH", "Place query did not complete. Error: " + places.getStatus().toString());
+                Log.e("PlacesAPI:", "Place query did not complete. Error: " + places.getStatus().toString());
 
                 return;
             }
             // Get the Place object from the buffer.
             savedFoodPlace = places.get(0);
             mPlaces.add(savedFoodPlace);
-            Log.i("BRUH", "Place details received: " + savedFoodPlace.getName());
         }
     };
 
@@ -196,7 +196,6 @@ public class MainMenuFragment extends Fragment implements OnClickListener{
             case R.id.exit_button:
                 getActivity().finish();
                 break;
-
         }
     }
 }

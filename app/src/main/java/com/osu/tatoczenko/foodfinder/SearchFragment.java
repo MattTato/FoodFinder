@@ -50,7 +50,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
     private AutocompleteFilter mFilter;
     private PlaceAutocompleteAdapter mAdapter;
     private static final String TAG = "PlaceAutoCompleteAdapt";
-    private static final String TAG2 = "TYLER";
     private static final String PARCELABLELIST = "PlaceList";
 
     private LatLngBounds BOUNDS_FOOD_SEARCH;
@@ -78,14 +77,12 @@ public class SearchFragment extends Fragment implements OnClickListener{
         /*
             So Autocomplete only filters by certain things. So I can't filter by FOOD or RESTAURANT, but ESTABLISHMENT works.
             Here's the info: https://developers.google.com/places/supported_types
-            For now, it's better than nothing, but not exactly what I want. May look into further filtering.
           */
         placeList.add(Place.TYPE_ESTABLISHMENT);
         mFilter = AutocompleteFilter.create(placeList);
         Log.d("Set has these places: ", mFilter.toString());
     }
 
-    // TODO: add some comments to this method
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -93,6 +90,9 @@ public class SearchFragment extends Fragment implements OnClickListener{
         View v = inflater.inflate(R.layout.fragment_search, container, false);
         mAutocompleteView = (AutoCompleteTextView) v.findViewById(R.id.autocomplete_food_search);
         mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+        /* In landscape view, AutoCompleteTextView has a Done button
+           Make Done button close the virtual keyboard, allowing the original fragment view to come back
+         */
         mAutocompleteView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -106,6 +106,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
         });
 
         CreatePlaceFilters();
+        // Set up the AutoCompleteTextView with a custom adapter made to work with the Places API for Android
         mAdapter = new PlaceAutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1, BOUNDS_FOOD_SEARCH, mFilter);
         mAutocompleteView.setAdapter(mAdapter);
         mAdapter.setGoogleApiClient(mGoogleApiClient);
@@ -118,6 +119,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
         View btnBack = v.findViewById(R.id.searchback_button);
         btnBack.setOnClickListener(this);
 
+        // Mostly helpful for when rotating the screen, as the previously searched for place should still be mapped
         if(savedInstanceState != null){
             ArrayList<MapPlacesParcelable> list = savedInstanceState.getParcelableArrayList(PARCELABLELIST);
             for(MapPlacesParcelable mapPlace : list){
@@ -134,7 +136,6 @@ public class SearchFragment extends Fragment implements OnClickListener{
     public void onSaveInstanceState(Bundle outState){
         ArrayList<MapPlacesParcelable> list = new ArrayList<>();
         for (Place place : mPlaces) {
-            Log.d("Test: ", place.getId());
             list.add(new MapPlacesParcelable(place));
         }
         outState.putParcelableArrayList(PARCELABLELIST, list);
@@ -193,16 +194,13 @@ public class SearchFragment extends Fragment implements OnClickListener{
             }
             // Get the Place object from the buffer.
             searchedFoodPlace = places.get(0);
-            Log.i(TAG2,"test" + searchedFoodPlace);
             // Add this Place object into the ArrayList for easy passing into the FoodMapFragment
             mPlaces.clear();
             mPlaces.add(searchedFoodPlace);
-
-            Log.i(TAG, "Place details received: " + searchedFoodPlace.getName());
+            Log.i(TAG, "Place details received" + searchedFoodPlace.getName());
         }
     };
 
-       // TODO: add some comments to this method
     public void onClick(View v){
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -211,6 +209,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
                 mAutocompleteView.setText("");
                 break;
             case R.id.map_button:
+                // Starts the FoodMapFragment and sends the most recent searched for place to the map to be viewed
                 fragmentTransaction = fragmentManager.beginTransaction();
                 FoodMapFragment mapFragment = new FoodMapFragment();
                 mapFragment.SetupMarkerLocation(mLocation);
