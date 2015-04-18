@@ -85,7 +85,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
         Log.d("Set has these places: ", mFilter.toString());
     }
 
-
+    // TODO: add some comments to this method
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -202,6 +202,7 @@ public class SearchFragment extends Fragment implements OnClickListener{
         }
     };
 
+       // TODO: add some comments to this method
     public void onClick(View v){
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;

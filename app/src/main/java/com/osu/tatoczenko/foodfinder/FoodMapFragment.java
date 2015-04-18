@@ -148,6 +148,8 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
                 mapSettings.setAllGesturesEnabled(true);
                 mapSettings.setZoomControlsEnabled(true);
                 mapSettings.setMyLocationButtonEnabled(true);
+                // Add marker for the current location of the user, center it on the current location,
+                // then add the searched for or saved places to the map
                 if(currentLocation != null) {
                     setMarkerByLocation(currentLocation);
                     mMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your location"));
@@ -290,6 +292,7 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
+    // TODO: maybe some comments here just to explain? I dunno
     private	boolean hasNetworkConnection(){
         ConnectivityManager connectivityManager	=
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
