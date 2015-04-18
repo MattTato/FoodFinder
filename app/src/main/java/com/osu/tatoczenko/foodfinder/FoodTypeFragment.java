@@ -167,13 +167,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
     }
 
     private void mapPlaces() {
-        // Get the places by id
-        /*for (int i = 0; i < places.size(); i++) {
-            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient,
-                    places.get(i));
-            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
-        }*/
-
         // Map the places
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction;
@@ -186,25 +179,6 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
         fragmentTransaction.commit();
     }
 
-    // shamelessly taken from Matt's SearchFragment code since I don't know this places stuff as well as he does
-    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
-            = new ResultCallback<PlaceBuffer>() {
-        @Override
-        public void onResult(PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()) {
-                // Request did not complete successfully
-                Log.e("FoodTypeFragment: ", "Place query did not complete. Error: " + places.getStatus().toString());
-
-                return;
-            }
-            // Get the Place object from the buffer.
-            Place searchedFoodPlace = places.get(0);
-            //mPlaces.add(searchedFoodPlace);
-
-            Log.i("FoodTypeFragment: ", "Place details received: " + searchedFoodPlace.getName());
-        }
-    };
-
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.clear_foodtype_search_button:
@@ -215,6 +189,9 @@ public class FoodTypeFragment extends Fragment implements OnClickListener{
                 break;
             case R.id.foodtype_map_button:
                 if(mLocation != null) {
+                    // Use the Google Places Browser API to make a more general call
+                    // than the other parts of the app, specifically using whatever is currently
+                    // in the text field
                     String queryURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
                             + mLocation.getLatitude() + "," + mLocation.getLongitude() + "&radius=3000"
                             + "&types=food&keyword=" + autoComplete.getText() + "&key="

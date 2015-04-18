@@ -57,6 +57,9 @@ public class FoodMapFragment extends Fragment implements GoogleMap.OnMarkerClick
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mPlaceIDs = new ArrayList<>();
 
+    // The way the code currently is, either mPlaces will have stuff in it while the others are
+    // empty, or mPlaces will be empty while the others have stuff in them
+
     private MapFragment mapFragment;
 
     private static final String PARCELABLELIST = "MapMarkerList";
